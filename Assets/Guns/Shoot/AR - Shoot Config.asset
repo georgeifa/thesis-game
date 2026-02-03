@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3841e4803153c9409567bbf6a49c930, type: 3}
+  m_Name: AR - Shoot Config
+  m_EditorClassIdentifier: 
+  HitMask:
+    serializedVersion: 2
+    m_Bits: 73
+  SpreadRecoverySpeed: 1
+  MaxSpreadTime: 1
+  Spread: {x: 0.1, y: 0.1, z: 0.1}
+  recoilStrenth: {x: 0.03, y: 0.02, z: 0.08}
+  springSpeed: 8
+  damping: 0.7
+  FireRate: 0.25

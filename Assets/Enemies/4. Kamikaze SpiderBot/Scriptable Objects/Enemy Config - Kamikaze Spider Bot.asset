@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1805b8aebc8fceb488dc565eef6af2a8, type: 3}
+  m_Name: Enemy Config - Kamikaze Spider Bot
+  m_EditorClassIdentifier: 
+  Prefab: {fileID: 7194553180869591384, guid: 8932fa041295f2345a17a32777d4837b, type: 3}
+  Health: 100
+  walkSpeed: 1.5
+  chaseSpeed: 4.5
+  rotationSpeed: 180
+  turnSlowFactor: 0.5
+  maxTurnAngle: 45
+  UtilitySkill: {fileID: 0}
+  speedParam: Speed
+  isMovingParam: IsMoving
+  ResetParam: Reset
+  HitDirectionParam: HitDirection
+  UnlockEnemySkillsAfter: 0
+  NavMeshAgentConfig: {fileID: 11400000, guid: 6c3a09c6c591f674e955f8f69030b032, type: 2}
+  FOVConfig: {fileID: 11400000, guid: d18a56a33698f7940b86d45a9b473ae0, type: 2}
+  CombatConfig: {fileID: 11400000, guid: ffa40b91f2a8501449afa0e0ec2d1a27, type: 2}
+  DeathSO: {fileID: 11400000, guid: bcf047f2e46ead14c87cc677835415f1, type: 2}

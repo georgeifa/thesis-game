@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1805b8aebc8fceb488dc565eef6af2a8, type: 3}
+  m_Name: Enemy Config - Melee Mutant
+  m_EditorClassIdentifier: 
+  Prefab: {fileID: 7476447826649496181, guid: 91844b8ba8caf3340b02ec9e75c87086, type: 3}
+  Health: 100
+  walkSpeed: 2
+  runSpeed: 3.5
+  chaseSpeed: 6
+  rotationSpeed: 540
+  turnSlowFactor: 0.5
+  maxTurnAngle: 45
+  UtilitySkill: {fileID: 11400000, guid: e5c2730e934109948bb052a0108fa56b, type: 2}
+  speedParam: Speed
+  isMovingParam: IsMoving
+  NavMeshAgentConfig: {fileID: 11400000, guid: 8f0a5e0877aa75b46b4d47a18f5b4dcc, type: 2}
+  FOVConfig: {fileID: 11400000, guid: 7ac9e8be21e05d348911234a1cbd92c0, type: 2}
+  CombatConfig: {fileID: 11400000, guid: 8350e4a8891f8ec43af2a0909dce90b2, type: 2}
+  DeathSO: {fileID: 11400000, guid: 3b0a6cfc0eae58745bf6810aa45cf5b7, type: 2}

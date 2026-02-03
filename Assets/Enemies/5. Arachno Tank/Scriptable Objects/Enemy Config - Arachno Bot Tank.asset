@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1805b8aebc8fceb488dc565eef6af2a8, type: 3}
+  m_Name: Enemy Config - Arachno Bot Tank
+  m_EditorClassIdentifier: 
+  Prefab: {fileID: 3206820263750804223, guid: 576a3838cba859245b1cb0bca82b49e7, type: 3}
+  Health: 100
+  ChasingSpeed: 2
+  NavMeshAgentConfig: {fileID: 11400000, guid: a1d68bd1783c0c9449aeefceab779b92, type: 2}
+  FOVConfig: {fileID: 11400000, guid: 199d38450c577564fa477b681e73621b, type: 2}
+  CombatConfig: {fileID: 11400000, guid: 4362230edb98b2045b5b65bf33b093c8, type: 2}
+  DeathSO: {fileID: 11400000, guid: 298e8f4d42fa64942b877d9364b0e60c, type: 2}

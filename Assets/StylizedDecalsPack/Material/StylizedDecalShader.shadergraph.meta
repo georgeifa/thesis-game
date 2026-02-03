@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 84bdc9b846d4c3d42a96c44a69a36d4e
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 625f186215c104763be7675aa2d941aa, type: 3}
+AssetOrigin:
+  serializedVersion: 1
+  productId: 315523
+  packageName: "Stylized Mega Decal Pack \u2013 160+"
+  packageVersion: 1.1
+  assetPath: Assets/StylizedDecalsPack/Material/StylizedDecalShader.shadergraph
+  uploadId: 775982

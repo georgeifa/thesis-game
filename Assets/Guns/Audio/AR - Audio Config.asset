@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66838a84403d83d42aaeea82e6f03d55, type: 3}
+  m_Name: AR - Audio Config
+  m_EditorClassIdentifier: 
+  Volume: 1
+  FireClips: []
+  EmptyClip: {fileID: 0}
+  ReloadClip: {fileID: 0}
+  LastBulletClip: {fileID: 0}

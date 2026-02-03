@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dbe960aa3352304cade5f2ba77e6e13, type: 3}
+  m_Name: Explosion Death
+  m_EditorClassIdentifier: 
+  freezeAfter: 2
+  SinkAfter: 2
+  sinkSpeed: 2
+  Damage: 5
+  Radius: 3
+  Delay: 1
+  DamagableLayermask:
+    serializedVersion: 2
+    m_Bits: 192
+  ExplosionPrefab: {fileID: 9093161073795569192, guid: 7d24f0bc59be8bb49a25b55e55925ffa, type: 3}

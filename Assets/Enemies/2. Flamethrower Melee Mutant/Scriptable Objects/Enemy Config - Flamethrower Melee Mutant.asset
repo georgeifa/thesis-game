@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1805b8aebc8fceb488dc565eef6af2a8, type: 3}
+  m_Name: Enemy Config - Flamethrower Melee Mutant
+  m_EditorClassIdentifier: 
+  Prefab: {fileID: 2876614716546469640, guid: ad40d690d358fd84b88fbb12016b87f0, type: 3}
+  Health: 100
+  walkSpeed: 2
+  chaseSpeed: 6
+  rotationSpeed: 540
+  turnSlowFactor: 0.5
+  maxTurnAngle: 45
+  UtilitySkill: {fileID: 0}
+  speedParam: Speed
+  isMovingParam: IsMoving
+  ResetParam: Reset
+  HitDirectionParam: HitDirection
+  NavMeshAgentConfig: {fileID: 11400000, guid: fa131faa1a8d79e43895896c3bda82f9, type: 2}
+  FOVConfig: {fileID: 11400000, guid: 23c70d9f0c428fd4587cee76ccae2839, type: 2}
+  CombatConfig: {fileID: 11400000, guid: 95d3cd07b4ec727449ad7792c0d3629e, type: 2}
+  DeathSO: {fileID: 11400000, guid: 3b0a6cfc0eae58745bf6810aa45cf5b7, type: 2}

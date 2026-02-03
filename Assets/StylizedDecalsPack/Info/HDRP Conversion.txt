@@ -1,0 +1,1 @@
+If you're using the HDRP pipeline, make sure to update each material by replacing the shader from StylizedDecalShader to StylizedDecalShaderHDRP for proper compatibility.

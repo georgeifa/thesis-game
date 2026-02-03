@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ea8f16c91e5ba645a3bf4e73316b186, type: 3}
+  m_Name: Metal Enemy - Surface
+  m_EditorClassIdentifier: 
+  ImpactTypeEffects:
+  - ImpactType: {fileID: 11400000, guid: 1309607f79aad264d8b1a66dafdeaebd, type: 2}
+    SurfaceEffect: {fileID: 11400000, guid: eb7a5b075fe88dc4da3ae6b969b8c550, type: 2}

@@ -16,8 +16,8 @@ MonoBehaviour:
   Type: 1
   Name: AR
   ModelPrefab: {fileID: 779918907432351797, guid: 42d03bda482c47743ba968b1f25a2198, type: 3}
-  SpawnPoint: {x: 0, y: 0, z: 0}
-  SpawnRotation: {x: 0, y: 0, z: 0}
+  SpawnPoint: {x: -0.118, y: -0.252, z: 0.018}
+  SpawnRotation: {x: 272.22043, y: 28.560514, z: 64.49772}
   DamageConfig: {fileID: 11400000, guid: a9d19b9d9f64aaa46a088fec334288ac, type: 2}
   AmmoConfig: {fileID: 11400000, guid: 93d3ad276267ba34e84962ec5edd0547, type: 2}
   ShootConfig: {fileID: 11400000, guid: a480f5acea36654409dd196ecc4c8410, type: 2}

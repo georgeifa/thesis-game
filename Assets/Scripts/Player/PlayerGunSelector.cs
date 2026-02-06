@@ -16,10 +16,14 @@ public class PlayerGunSelector : MonoBehaviour
     private Transform Grip;
     [SerializeField]
     private Transform Trigger;
+    [SerializeField]
+    private Transform Magazine;
 
     //reference of the grip and trigger location on the gun
     private Transform gripRef;
     private Transform triggerRef;
+    private Transform magRef;
+
 
     [Space]
     [Header("Runtime Filled")]
@@ -50,6 +54,9 @@ public class PlayerGunSelector : MonoBehaviour
             
             if (triggerRef != null)
                 Trigger.SetPositionAndRotation(triggerRef.position, triggerRef.rotation);
+
+            if (magRef != null)
+                Magazine.SetPositionAndRotation(magRef.position, magRef.rotation);
         }
     
     }
@@ -62,6 +69,8 @@ public class PlayerGunSelector : MonoBehaviour
             Transform[] allChildren = ActiveGun.GetInGameModel().GetComponentsInChildren<Transform>();
             gripRef = allChildren.FirstOrDefault(child => child.name == "ref_grip");
             triggerRef = allChildren.FirstOrDefault(child => child.name == "ref_trigger");
+            magRef = allChildren.FirstOrDefault(child => child.name == "ref_magazine");
+
         }
     }
 }

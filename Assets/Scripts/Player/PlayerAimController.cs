@@ -35,7 +35,6 @@ public class PlayerAimController : MonoBehaviour
     [SerializeField] private float rotationTimeAim = 2f;
 
     [Header("Aim Settings")]
-    [SerializeField] private Rig aimingRig;
     [SerializeField] private float aimDuration = .3f;
     [SerializeField] private LayerMask groundMask;
 
@@ -107,13 +106,11 @@ public class PlayerAimController : MonoBehaviour
                 }
 
                 isAiming = true;
-                aimingRig.weight = Mathf.MoveTowards(aimingRig.weight, 1, Time.deltaTime * aimDuration);
             }
         }
         else if (!transform.forward.Equals(Vector3.forward))
         {
             isAiming = false;
-            aimingRig.weight = Mathf.MoveTowards(aimingRig.weight, 0, Time.deltaTime * aimDuration);
         }
     }
 

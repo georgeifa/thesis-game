@@ -14,7 +14,7 @@ public class ShootConfigurationScriptableObject : ScriptableObject
     [Tooltip("The maximum values the spread can reach from the center")]
     public Vector3 Spread = new Vector3(.1f, .1f, .1f);
     [Header("Spring Recoil Settings")]
-    [Tooltip("Z should always be the largest to make more natural animation (knockback from the gun firing). X and Y are to make the animation more natural & random")]
+    [Tooltip("Υ should always be the largest to make more natural animation (knockback from the gun firing). X and Z are to make the animation more natural & random")]
     public Vector3 recoilStrenth = new Vector3(.1f, .1f, .1f);
     [Tooltip("Value for how fast gun returns to original position")]
     public float springSpeed = 8f;
@@ -48,13 +48,13 @@ public class ShootConfigurationScriptableObject : ScriptableObject
     {
         return new Vector3(
                     Random.Range(
-                        -recoilStrenth.x,
+                        0,
                         recoilStrenth.x),
                     Random.Range(
-                        0,
+                        recoilStrenth.y / 2,
                         recoilStrenth.y),
                     Random.Range(
-                        recoilStrenth.z / 2,
+                        -recoilStrenth.z,
                         recoilStrenth.z)
                 );
     }

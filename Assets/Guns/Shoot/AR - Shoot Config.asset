@@ -18,7 +18,7 @@ MonoBehaviour:
   SpreadRecoverySpeed: 1
   MaxSpreadTime: 1
   Spread: {x: 0.1, y: 0.1, z: 0.1}
-  recoilStrenth: {x: 0.03, y: 0.02, z: 0.08}
+  recoilStrenth: {x: 0.02, y: 0.1, z: 0.03}
   springSpeed: 8
   damping: 0.7
   FireRate: 0.25

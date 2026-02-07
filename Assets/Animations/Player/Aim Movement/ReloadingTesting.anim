@@ -87332,4 +87332,11 @@ AnimationClip:
   m_EulerEditorCurves: []
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
-  m_Events: []
+  m_Events:
+  - time: 2.6666667
+    functionName: EndReload
+    data: 
+    objectReferenceParameter: {fileID: 11500000, guid: 15646541529762340a6d0997e35855d6, type: 3}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0

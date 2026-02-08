@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
@@ -10,6 +11,8 @@ public class PlayerGunSelector : MonoBehaviour
     private GunType Gun;
     [SerializeField]
     private Transform GunParent;
+    [SerializeField]
+    private Transform MagParent;
     [SerializeField]
     private List<GunScriptableObject> Guns;
     [SerializeField]
@@ -41,7 +44,7 @@ public class PlayerGunSelector : MonoBehaviour
 
         ActiveGun = gun;
 
-        gun.Spawn(GunParent, this);
+        gun.Spawn(GunParent,MagParent, this);
         CacheGunReferences();
     }
 
@@ -66,10 +69,10 @@ public class PlayerGunSelector : MonoBehaviour
     {
         if (ActiveGun != null)
         {
-            Transform[] allChildren = ActiveGun.GetInGameModel().GetComponentsInChildren<Transform>();
-            gripRef = allChildren.FirstOrDefault(child => child.name == "ref_grip");
-            triggerRef = allChildren.FirstOrDefault(child => child.name == "ref_trigger");
-            magRef = allChildren.FirstOrDefault(child => child.name == "ref_magazine");
+            PlayerWeapon weapon = ActiveGun.GetInGameModel().GetComponent<PlayerWeapon>();
+            gripRef = weapon.Grip.transform;
+            triggerRef = weapon.Trigger.transform;
+            magRef = weapon.Magazine.transform;
 
         }
     }

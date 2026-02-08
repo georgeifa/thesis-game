@@ -44,16 +44,21 @@ public class GunScriptableObject : ScriptableObject
     private ParticleSystem ShootSystem;
     private ObjectPool TrailPool;
 
-    public void Spawn(Transform Parent, MonoBehaviour ActiveMonoBehaviour)
+    public void Spawn(Transform GunParent,Transform MagParent, MonoBehaviour ActiveMonoBehaviour)
     {
         this.ActiveMonoBehaviour = ActiveMonoBehaviour;
         LastShootTime = 0; // in editor this will not be properly reset, in build it's fine
         TrailPool = ObjectPool.CreateInstance(CreateTrail(),100);
 
         Model = Instantiate(ModelPrefab);
-        Model.transform.SetParent(Parent, false);
+        Model.transform.SetParent(GunParent, false);
         Model.transform.localPosition = SpawnPoint;
         Model.transform.localRotation = Quaternion.Euler(SpawnRotation);
+
+
+        Transform Magazine = Model.GetComponent<PlayerWeapon>().Magazine_Model.transform;
+        MagParent.transform.parent.localPosition = Magazine.transform.position;
+        Magazine.transform.SetParent(MagParent,this);
 
         targetPosition = Model.transform.localPosition;
         

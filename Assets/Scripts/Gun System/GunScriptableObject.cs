@@ -44,7 +44,7 @@ public class GunScriptableObject : ScriptableObject
     private ParticleSystem ShootSystem;
     private ObjectPool TrailPool;
 
-    public void Spawn(Transform GunParent,Transform MagParent, MonoBehaviour ActiveMonoBehaviour)
+    public GameObject Spawn(Transform GunParent,Transform MagParent, MonoBehaviour ActiveMonoBehaviour)
     {
         this.ActiveMonoBehaviour = ActiveMonoBehaviour;
         LastShootTime = 0; // in editor this will not be properly reset, in build it's fine
@@ -67,6 +67,7 @@ public class GunScriptableObject : ScriptableObject
         ShootSystem = Model.GetComponentInChildren<ParticleSystem>();
         ShootingAudioSource = Model.GetComponentInChildren<AudioSource>();
 
+        return Model;
     }
 
     public GameObject GetInGameModel()

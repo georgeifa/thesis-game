@@ -16464,7 +16464,7 @@ MonoBehaviour:
   AnimationFloorLevel: 0.001
   _Editor_Foldout_Setup_LegsList: 1
   _Editor_EnsureCount: 0
-  _Editor_OnValidateTrigger: 1
+  _Editor_OnValidateTrigger: 0
   _EditorAllowAutoUpdateFeetParams: 1
   _EditorCategory: 2
   _EditorSetupCategory: 2
@@ -16550,13 +16550,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Gun: 1
-  GunParent: {fileID: 1905888955}
-  MagParent: {fileID: 586929471}
-  Guns:
-  - {fileID: 11400000, guid: e10ffcf5cee60bb479a6e77fde82e617, type: 2}
-  Grip: {fileID: 1040876445}
-  Trigger: {fileID: 1904689161}
-  Magazine: {fileID: 265470382}
+  PrimaryGunSO: {fileID: 11400000, guid: e10ffcf5cee60bb479a6e77fde82e617, type: 2}
+  PrimaryGun: {fileID: 0}
+  PrimaryGunParent: {fileID: 1905888955}
+  PrimaryMagParent: {fileID: 586929471}
+  PrimaryGrip: {fileID: 1040876445}
+  PrimaryTrigger: {fileID: 1904689161}
+  PrimaryMagazine: {fileID: 265470382}
+  SecondaryGunSO: {fileID: 0}
+  SecondaryGun: {fileID: 0}
+  SecondaryGunParent: {fileID: 0}
+  SecondaryMagParent: {fileID: 0}
+  SecondaryGrip: {fileID: 0}
+  SecondaryTrigger: {fileID: 0}
+  SecondaryMagazine: {fileID: 0}
+  ActiveWeapon: 0
   ActiveGun: {fileID: 0}
 --- !u!114 &1843514419
 MonoBehaviour:

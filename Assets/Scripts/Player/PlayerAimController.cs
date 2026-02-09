@@ -137,8 +137,6 @@ public class PlayerAimController : MonoBehaviour
             GunSelector.ActiveGun.StartReloading();
             isReloading = true;
             animator.SetTrigger("Reload");
-            //have to change ik0,0
-
         }
     }
 
@@ -146,8 +144,6 @@ public class PlayerAimController : MonoBehaviour
     {
         isReloading = false;
         GunSelector.ActiveGun.EndReload();
-        //have to change ik
-
     }
 
     void HandleAnimations()

@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
+using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.InputSystem;
 using UnityEngine.Pool;
+using UnityEngine.Rendering;
 
 
 public class PlayerAimController : MonoBehaviour
@@ -19,6 +21,18 @@ public class PlayerAimController : MonoBehaviour
     //private RaycastWeapon weapon;
 
     // Animation
+    [Header("Animation Setting")]
+    [SerializeField] private string reloadTriggerParam;
+    [SerializeField] private string swapTriggerParam;
+
+    [SerializeField] private string weaponIDParam;
+    [SerializeField] private string LowerAimLayer;
+    [SerializeField] private string UpperAimLayer;
+    [SerializeField] private string actionsLayer;
+
+
+
+
     private int aimingLayerIndexUpper;
     private int aimingLayerIndexLower;
     private int reloadingLayerIndexUpper;
@@ -28,8 +42,12 @@ public class PlayerAimController : MonoBehaviour
     private InputAction mousePosition;
     private InputAction fireAction;
     private InputAction reloadAction;
+    private InputAction swapAction;
+
 
     private bool isReloading;
+    private bool isSwaping;
+
     public bool isAiming = false;
 
     [SerializeField] private float rotationTimeAim = 2f;
@@ -51,9 +69,9 @@ public class PlayerAimController : MonoBehaviour
         mainCamera = Camera.main; // Cache Camera.main
 
         // Cache layer indices once
-        aimingLayerIndexLower = animator.GetLayerIndex("Aim Movement - Lower Body");
-        aimingLayerIndexUpper = animator.GetLayerIndex("Aiming - Upper Body");
-        reloadingLayerIndexUpper = animator.GetLayerIndex("Reloading");
+        aimingLayerIndexLower = animator.GetLayerIndex(LowerAimLayer);
+        aimingLayerIndexUpper = animator.GetLayerIndex(UpperAimLayer);
+        reloadingLayerIndexUpper = animator.GetLayerIndex(actionsLayer);
 
 
         InitializeActions();
@@ -65,12 +83,17 @@ public class PlayerAimController : MonoBehaviour
         fireAction = playerInput.actions["Attack"];
         reloadAction = playerInput.actions["Reload"];
         mousePosition = playerInput.actions["Cursor Position"];
+        swapAction = playerInput.actions["Swap"];
         
     }
 
 
     void Update()
     {
+        if(isReloading || isSwaping) return;
+
+
+        SwapGun();
         Reload();
         if (!isReloading)
         {
@@ -134,16 +157,37 @@ public class PlayerAimController : MonoBehaviour
 
         if (reloadPressed && !isReloading && GunSelector.ActiveGun.CanReload())
         {
-            GunSelector.ActiveGun.StartReloading();
+            GunSelector.StartReloading();
             isReloading = true;
-            animator.SetTrigger("Reload");
+            animator.SetInteger(weaponIDParam,1);
+            animator.SetTrigger(reloadTriggerParam);
+
         }
+    }
+
+    void SwapGun()
+    {
+        float swapDir = swapAction.ReadValue<float>();
+        if( swapDir != 0)
+        {
+            isSwaping = true;
+            animator.SetInteger(weaponIDParam,GunSelector.GetWeaponID());
+            animator.SetTrigger(swapTriggerParam);
+        }
+    }
+
+    public void OnSwapEnd()
+    {
+        isSwaping = false;
+        animator.SetInteger(weaponIDParam,0);
+
     }
 
     public void EndReload()
     {
         isReloading = false;
-        GunSelector.ActiveGun.EndReload();
+        animator.SetInteger(weaponIDParam,0);
+        GunSelector.EndReloading();
     }
 
     void HandleAnimations()
@@ -155,7 +199,7 @@ public class PlayerAimController : MonoBehaviour
         animator.SetLayerWeight(aimingLayerIndexLower, currentAimWeight);
         animator.SetLayerWeight(aimingLayerIndexUpper, currentAimWeight);
 
-        animator.SetLayerWeight(reloadingLayerIndexUpper, isReloading ? 1f : 0f);
+        animator.SetLayerWeight(reloadingLayerIndexUpper, isReloading || isSwaping ? 1f : 0f);
     }
 
 }

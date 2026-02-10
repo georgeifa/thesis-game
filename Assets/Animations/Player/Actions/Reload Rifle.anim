@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ReloadingTesting
+  m_Name: Reload Rifle
   serializedVersion: 7
   m_Legacy: 0
   m_Compressed: 0
@@ -43117,7 +43117,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_Data.m_SourceObjects.m_Item0.weight
-    path: Rigs/RigLayer - Magazine/GameObject
+    path: Rigs/RigLayer - Magazine/Primary Weapon Magazine - Parent
     classID: 114
     script: {fileID: 11500000, guid: 8935e03361a14ec4b8edc872f76bc822, type: 3}
     flags: 0
@@ -43127,6 +43127,15 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.5
         value: 0
         inSlope: 0
         outSlope: 0
@@ -43165,7 +43174,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_Data.m_SourceObjects.m_Item1.weight
-    path: Rigs/RigLayer - Magazine/GameObject
+    path: Rigs/RigLayer - Magazine/Primary Weapon Magazine - Parent
     classID: 114
     script: {fileID: 11500000, guid: 8935e03361a14ec4b8edc872f76bc822, type: 3}
     flags: 0
@@ -43204,7 +43213,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: WeaponHolder/MagHolder
+    path: WeaponHolders/Primary Weapon - WeaponHolder/Primary Weapon - MagHolder
     classID: 1
     script: {fileID: 0}
     flags: 0
@@ -43298,7 +43307,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 643036685
+      path: 3876684062
       attribute: 1711255866
       script: {fileID: 11500000, guid: 8935e03361a14ec4b8edc872f76bc822, type: 3}
       typeID: 114
@@ -43307,7 +43316,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 643036685
+      path: 3876684062
       attribute: 2840965540
       script: {fileID: 11500000, guid: 8935e03361a14ec4b8edc872f76bc822, type: 3}
       typeID: 114
@@ -43316,7 +43325,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 3347100577
+      path: 1563263293
       attribute: 2086281974
       script: {fileID: 0}
       typeID: 1
@@ -87553,7 +87562,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_Data.m_SourceObjects.m_Item0.weight
-    path: Rigs/RigLayer - Magazine/GameObject
+    path: Rigs/RigLayer - Magazine/Primary Weapon Magazine - Parent
     classID: 114
     script: {fileID: 11500000, guid: 8935e03361a14ec4b8edc872f76bc822, type: 3}
     flags: 0
@@ -87563,6 +87572,15 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.5
         value: 0
         inSlope: 0
         outSlope: 0
@@ -87601,7 +87619,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_Data.m_SourceObjects.m_Item1.weight
-    path: Rigs/RigLayer - Magazine/GameObject
+    path: Rigs/RigLayer - Magazine/Primary Weapon Magazine - Parent
     classID: 114
     script: {fileID: 11500000, guid: 8935e03361a14ec4b8edc872f76bc822, type: 3}
     flags: 0
@@ -87640,7 +87658,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: WeaponHolder/MagHolder
+    path: WeaponHolders/Primary Weapon - WeaponHolder/Primary Weapon - MagHolder
     classID: 1
     script: {fileID: 0}
     flags: 0

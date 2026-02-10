@@ -27,6 +27,14 @@ public class PlayerControls : MonoBehaviour
     private bool isRunning;
 
     // Animation
+    [Header("Animation Settings")]
+    [SerializeField] private string groundedParam;
+    [SerializeField] private string walkingParam;
+    [SerializeField] private string playerSpeedParam;
+    [SerializeField] private string forwardParam;
+    [SerializeField] private string turnParam;
+
+
     private float forwardAmount;
     private float turnAmount;
 
@@ -47,14 +55,20 @@ public class PlayerControls : MonoBehaviour
     [SerializeField] private float rotationTimeRunning = 1f;
 
     // Animation parameter hashes - FOR BETTER OPTIMIZATION
-    private static readonly int IsGroundedHash = Animator.StringToHash("isGrounded");
-    private static readonly int IsWalkingHash = Animator.StringToHash("isWalking");
-    private static readonly int PlayerSpeedHash = Animator.StringToHash("playerSpeed");
-    private static readonly int ForwardAmountHash = Animator.StringToHash("Forward Amount");
-    private static readonly int TurnAmountHash = Animator.StringToHash("Turn Amount");
+    private static int IsGroundedHash;
+    private static int IsWalkingHash;
+    private static int PlayerSpeedHash;
+    private static int ForwardAmountHash;
+    private static int TurnAmountHash;
 
     private void Start()
     {
+        IsGroundedHash = Animator.StringToHash(groundedParam);
+        IsWalkingHash = Animator.StringToHash(walkingParam);
+        PlayerSpeedHash = Animator.StringToHash(playerSpeedParam);
+        ForwardAmountHash = Animator.StringToHash(forwardParam);
+        TurnAmountHash = Animator.StringToHash(turnParam);
+
         playerInput = GetComponent<PlayerInput>();
         aimController = GetComponent<PlayerAimController>();
         controller = GetComponent<CharacterController>();

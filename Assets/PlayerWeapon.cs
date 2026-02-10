@@ -8,6 +8,7 @@ public class PlayerWeapon : MonoBehaviour
     public GameObject Magazine;
 
     [Header("Gun Parts References")]
+    public GameObject Parent_Model;
     public GameObject Magazine_Model;
 
 }

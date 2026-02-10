@@ -11,6 +11,7 @@ public class PlayerGunSelector : MonoBehaviour
 {
     public enum WeaponType
     {
+        Unarmed,
         Primary,
         Secondary
     }
@@ -18,6 +19,12 @@ public class PlayerGunSelector : MonoBehaviour
     [SerializeField]
     private GunType Gun;
 
+    [SerializeField]
+    private Transform Grip;
+    [SerializeField]
+    private Transform Trigger;
+    [SerializeField]
+    private Transform Magazine;
 
     [Header("Primary Gun References")]
     public GunScriptableObject PrimaryGunSO;
@@ -26,12 +33,7 @@ public class PlayerGunSelector : MonoBehaviour
     private Transform PrimaryGunParent;
     [SerializeField]
     private Transform PrimaryMagParent;
-    [SerializeField]
-    private Transform PrimaryGrip;
-    [SerializeField]
-    private Transform PrimaryTrigger;
-    [SerializeField]
-    private Transform PrimaryMagazine;
+
 
     [Header("Secondary Gun References")]
     public GunScriptableObject SecondaryGunSO;
@@ -39,19 +41,13 @@ public class PlayerGunSelector : MonoBehaviour
     [SerializeField]
     private Transform SecondaryGunParent;
     [SerializeField]
-    private Transform SecondaryMagParent;
-    [SerializeField]
-    private Transform SecondaryGrip;
-    [SerializeField]
-    private Transform SecondaryTrigger;
-    [SerializeField]
-    private Transform SecondaryMagazine;
+    private Transform SecondaryMagParent;    
+
 
     //reference of the grip and trigger location on the gun
     private Transform gripRef;
     private Transform triggerRef;
     private Transform magRef;
-
 
     [Space]
     [Header("Runtime Filled")]
@@ -89,31 +85,34 @@ public class PlayerGunSelector : MonoBehaviour
 
     private void Update()
     {
-        switch (ActiveWeapon)
-            {
-                case WeaponType.Primary:
-                    if (gripRef != null)
-                        PrimaryGrip.SetPositionAndRotation(gripRef.position, gripRef.rotation);
+        if (gripRef != null)
+            Grip.SetPositionAndRotation(gripRef.position, gripRef.rotation);
                     
-                    if (triggerRef != null)
-                        PrimaryTrigger.SetPositionAndRotation(triggerRef.position, triggerRef.rotation);
+        if (triggerRef != null)
+            Trigger.SetPositionAndRotation(triggerRef.position, triggerRef.rotation);
 
-                    if (magRef != null)
-                        PrimaryMagazine.SetPositionAndRotation(magRef.position, magRef.rotation);
-                    break;
+        if (magRef != null)
+            Magazine.SetPositionAndRotation(magRef.position, magRef.rotation);    
+    }
 
-                case WeaponType.Secondary:
-                    if (gripRef != null)
-                        SecondaryGrip.SetPositionAndRotation(gripRef.position, gripRef.rotation);
-                    
-                    if (triggerRef != null)
-                        SecondaryTrigger.SetPositionAndRotation(triggerRef.position, triggerRef.rotation);
+    public int GetWeaponID()
+    {
+        if(ActiveWeapon == WeaponType.Primary) return 1;
+        if(ActiveWeapon == WeaponType.Secondary) return 2;
 
-                    if (magRef != null)
-                        SecondaryMagazine.SetPositionAndRotation(magRef.position, magRef.rotation);
-                    break;
-            }
-    
+        return 0;
+    }
+
+    public void StartReloading()
+    {
+        ActiveGun.StartReloading();
+        PrimaryGun.GetComponent<PlayerWeapon>().Magazine_Model.transform.SetParent(PrimaryMagParent);
+    }
+
+    public void EndReloading()
+    {
+        ActiveGun.EndReload();
+        PrimaryGun.GetComponent<PlayerWeapon>().Magazine_Model.transform.SetParent(PrimaryGun.GetComponent<PlayerWeapon>().Parent_Model.transform);
     }
     
 
@@ -142,11 +141,24 @@ public class PlayerGunSelector : MonoBehaviour
     {
         switch (GunID)
         {
-            case 0:
+            case 1:
                 PrimaryGunParent.gameObject.SetActive(false);
                 break;
-            case 1:
+            case 2:
                 SecondaryGunParent.gameObject.SetActive(false);
+                break;
+        }
+    }
+
+    public void SwapIn(int GunID)
+    {
+        switch (GunID)
+        {
+            case 1:
+                PrimaryGunParent.gameObject.SetActive(true);
+                break;
+            case 2:
+                SecondaryGunParent.gameObject.SetActive(true);
                 break;
         }
     }

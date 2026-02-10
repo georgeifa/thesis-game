@@ -55,10 +55,8 @@ public class GunScriptableObject : ScriptableObject
         Model.transform.localPosition = SpawnPoint;
         Model.transform.localRotation = Quaternion.Euler(SpawnRotation);
 
-
         Transform Magazine = Model.GetComponent<PlayerWeapon>().Magazine_Model.transform;
         MagParent.transform.parent.localPosition = Magazine.transform.position;
-        Magazine.transform.SetParent(MagParent,this);
 
         targetPosition = Model.transform.localPosition;
         

@@ -147,6 +147,7 @@ MonoBehaviour:
   Trigger: {fileID: 8150147022441286196}
   Grip: {fileID: 943626132150083896}
   Magazine: {fileID: 1791869891035072072}
+  Parent_Model: {fileID: 8895956614947836449}
   Magazine_Model: {fileID: 2860217791741125281}
 --- !u!1 &943626132150083896
 GameObject:

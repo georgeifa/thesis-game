@@ -6,15 +6,17 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
-[DisallowMultipleComponent]
-public class PlayerGunSelector : MonoBehaviour
-{
+
     public enum WeaponType
     {
         Unarmed,
         Primary,
         Secondary
     }
+
+[DisallowMultipleComponent]
+public class PlayerGunSelector : MonoBehaviour
+{
 
     [SerializeField]
     private GunType Gun;
@@ -156,9 +158,13 @@ public class PlayerGunSelector : MonoBehaviour
         {
             case 1:
                 PrimaryGunParent.gameObject.SetActive(true);
+                ActiveWeapon = WeaponType.Primary;
+                ActiveGun = PrimaryGunSO;
                 break;
             case 2:
                 SecondaryGunParent.gameObject.SetActive(true);
+                ActiveWeapon = WeaponType.Secondary;
+                ActiveGun = SecondaryGunSO;
                 break;
         }
     }

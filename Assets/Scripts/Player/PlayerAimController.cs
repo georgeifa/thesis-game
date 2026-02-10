@@ -47,6 +47,7 @@ public class PlayerAimController : MonoBehaviour
 
     private bool isReloading;
     private bool isSwaping;
+    private float swapDir;
 
     public bool isAiming = false;
 
@@ -167,7 +168,7 @@ public class PlayerAimController : MonoBehaviour
 
     void SwapGun()
     {
-        float swapDir = swapAction.ReadValue<float>();
+        swapDir = swapAction.ReadValue<float>();
         if( swapDir != 0)
         {
             isSwaping = true;
@@ -188,6 +189,18 @@ public class PlayerAimController : MonoBehaviour
         isReloading = false;
         animator.SetInteger(weaponIDParam,0);
         GunSelector.EndReloading();
+    }
+
+    public void ChangeWeaponID()
+    {
+        int weaponID = animator.GetInteger(weaponIDParam);
+        int newWeaponID = weaponID + (int)swapDir;
+        if(newWeaponID > Enum.GetNames(typeof(WeaponType)).Length-1)
+            newWeaponID = 1;
+        else if(newWeaponID < 1)
+            newWeaponID = Enum.GetNames(typeof(WeaponType)).Length-1;
+
+        animator.SetInteger(weaponIDParam,newWeaponID);
     }
 
     void HandleAnimations()

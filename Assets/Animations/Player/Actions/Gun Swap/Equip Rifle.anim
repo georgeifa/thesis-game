@@ -76198,7 +76198,7 @@ AnimationClip:
     floatParameter: 0
     intParameter: 1
     messageOptions: 0
-  - time: 3.5333333
+  - time: 3.1666667
     functionName: OnSwapEnd
     data: 
     objectReferenceParameter: {fileID: 11500000, guid: 15646541529762340a6d0997e35855d6, type: 3}

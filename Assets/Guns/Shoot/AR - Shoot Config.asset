@@ -21,4 +21,4 @@ MonoBehaviour:
   recoilStrenth: {x: 0.03, y: 0.02, z: 0.08}
   springSpeed: 8
   damping: 0.7
-  FireRate: 0.25
+  FireRate: 300

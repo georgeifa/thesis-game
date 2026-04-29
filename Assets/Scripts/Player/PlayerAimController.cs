@@ -88,7 +88,7 @@ public class PlayerAimController : MonoBehaviour
         if (aimingPressed)
         {
             //var (success, position) = Helpers.MousePositionToIsometric(mainCamera, mousePosition, groundMask,weapon.transform.position.y);
-            float y = GunSelector.ActiveGun.GetInGameModel().GetComponentInChildren<ParticleSystem>().transform.position.y;
+            float y = GunSelector.ActiveGun.GetComponentInChildren<ParticleSystem>().transform.position.y;
             var (success, position) = Helpers.MousePositionToIsometric(mainCamera, mousePosition, groundMask,y);
             
             if (success)
@@ -127,7 +127,7 @@ public class PlayerAimController : MonoBehaviour
             Aim();
             //weapon.StartFiring();
         }
-        GunSelector.ActiveGun.Tick(firePressed);
+        GunSelector.ActiveGun.GetComponent<Gun>().Tick(firePressed);
 
     }
 
@@ -135,9 +135,9 @@ public class PlayerAimController : MonoBehaviour
     {
         bool reloadPressed = reloadAction.IsPressed();
 
-        if (reloadPressed && !isReloading && GunSelector.ActiveGun.CanReload())
+        if (reloadPressed && !isReloading && GunSelector.ActiveGun.GetComponent<Gun>().CanReload())
         {
-            GunSelector.ActiveGun.StartReloading();
+            GunSelector.ActiveGun.GetComponent<Gun>().StartReloading();
             isReloading = true;
             animator.SetTrigger("Reload");
             //have to change ik0,0
@@ -148,7 +148,7 @@ public class PlayerAimController : MonoBehaviour
     public void EndReload()
     {
         isReloading = false;
-        GunSelector.ActiveGun.EndReload();
+        GunSelector.ActiveGun.GetComponent<Gun>().Reload();
         //have to change ik
 
     }

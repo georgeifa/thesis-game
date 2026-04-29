@@ -23,7 +23,7 @@ public class PlayerGunSelector : MonoBehaviour
 
     [Space]
     [Header("Runtime Filled")]
-    public GunScriptableObject ActiveGun;
+    public GameObject ActiveGun;
 
     void Start()
     {
@@ -35,9 +35,8 @@ public class PlayerGunSelector : MonoBehaviour
             return;
         }
 
-        ActiveGun = gun;
+        ActiveGun = gun.Spawn(GunParent);
 
-        gun.Spawn(GunParent, this);
         CacheGunReferences();
     }
 
@@ -59,7 +58,7 @@ public class PlayerGunSelector : MonoBehaviour
     {
         if (ActiveGun != null)
         {
-            Transform[] allChildren = ActiveGun.GetInGameModel().GetComponentsInChildren<Transform>();
+            Transform[] allChildren = ActiveGun.GetComponentsInChildren<Transform>();
             gripRef = allChildren.FirstOrDefault(child => child.name == "ref_grip");
             triggerRef = allChildren.FirstOrDefault(child => child.name == "ref_trigger");
         }

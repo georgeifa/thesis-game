@@ -1,10 +1,19 @@
+using MyBox;
 using UnityEditor.EditorTools;
 using UnityEngine;
+
+public enum FireMode
+{
+    SemiAuto,
+    FullAuto,
+    Shotgun
+}
 
 [CreateAssetMenu(fileName = "Shoot Config", menuName = "Guns/Shoot Configuration", order = 2)]
 public class ShootConfigurationScriptableObject : ScriptableObject
 {
     public LayerMask HitMask;
+
     [Space]
     [Header("Spread Settings")]
     [Tooltip("The time it takes for the spread to return to minimum")]
@@ -13,14 +22,20 @@ public class ShootConfigurationScriptableObject : ScriptableObject
     public float MaxSpreadTime = 1f;
     [Tooltip("The maximum values the spread can reach from the center")]
     public Vector3 Spread = new Vector3(.1f, .1f, .1f);
+
+    [Space]
     [Header("Spring Recoil Settings")]
     [Tooltip("Z should always be the largest to make more natural animation (knockback from the gun firing). X and Y are to make the animation more natural & random")]
     public Vector3 recoilStrenth = new Vector3(.1f, .1f, .1f);
     [Tooltip("Value for how fast gun returns to original position")]
     public float springSpeed = 8f;
     public float damping = 0.7f;
+
     [Space]
-    public float FireRate = .25f;
+    [Header("Firing Settings")]
+    public FireMode FireMode;
+    [ConditionalField(nameof(FireMode), false, FireMode.Shotgun)] public int PelletCount = 8;
+    public float FireRate = 600f;
 
     public Vector3 GetSpread(float ShootTime = 0)
     {
@@ -57,5 +72,10 @@ public class ShootConfigurationScriptableObject : ScriptableObject
                         recoilStrenth.z / 2,
                         recoilStrenth.z)
                 );
+    }
+
+    public float GetFireDelay()
+    {
+        return 60f / FireRate;
     }
 }

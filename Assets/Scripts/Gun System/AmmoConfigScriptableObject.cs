@@ -9,6 +9,8 @@ public class AmmoConfigScriptableObject : ScriptableObject
     public int CurrentAmmo = 120;
     public int CurrentClipAmmo = 30;
 
+    public float ReloadTime;
+
     public void Reload()
     {
         int reloadAmount = Mathf.Min(ClipSize, CurrentAmmo);

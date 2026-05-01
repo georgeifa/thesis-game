@@ -9,11 +9,9 @@ using UnityEngine.Pool;
 
 public class PlayerAimController : MonoBehaviour
 {
-    [SerializeField]
-    private PlayerGunSelector GunSelector;
+    private PlayerEquipmentManager equipmentManager;
 
     // Cached components
-    private PlayerInput playerInput;
     private Animator animator;
     private Camera mainCamera;
     //private RaycastWeapon weapon;
@@ -21,15 +19,8 @@ public class PlayerAimController : MonoBehaviour
     // Animation
     private int aimingLayerIndexUpper;
     private int aimingLayerIndexLower;
-    private int reloadingLayerIndexUpper;
     private float currentAimWeight = 0f;
 
-    private InputAction aimAction;
-    private InputAction mousePosition;
-    private InputAction fireAction;
-    private InputAction reloadAction;
-
-    private bool isReloading;
     public bool isAiming = false;
 
     [SerializeField] private float rotationTimeAim = 2f;
@@ -46,49 +37,30 @@ public class PlayerAimController : MonoBehaviour
 
     private void Start()
     {
-        playerInput = GetComponent<PlayerInput>();
         animator = GetComponent<Animator>();
+        equipmentManager = GetComponent<PlayerEquipmentManager>();
+
+        
         //weapon = GetComponentInChildren<RaycastWeapon>();
         mainCamera = Camera.main; // Cache Camera.main
 
         // Cache layer indices once
         aimingLayerIndexLower = animator.GetLayerIndex("Aim Movement - Lower Body");
         aimingLayerIndexUpper = animator.GetLayerIndex("Aiming - Upper Body");
-        reloadingLayerIndexUpper = animator.GetLayerIndex("Reloading");
-
-
-        InitializeActions();
-    }
-
-    void InitializeActions()
-    {
-        aimAction = playerInput.actions["Aim"];
-        fireAction = playerInput.actions["Attack"];
-        reloadAction = playerInput.actions["Reload"];
-        mousePosition = playerInput.actions["Cursor Position"];
-        
     }
 
 
     void Update()
     {
-        Reload();
-        if (!isReloading)
-        {
-            Aim();
-            Fire();
-        }
         HandleAnimations();
     }
 
-    void Aim()
+    public void Aim(bool aimingPressed, InputAction mousePosition)
     {
-        bool aimingPressed = aimAction.IsPressed() || fireAction.IsPressed();
-
         if (aimingPressed)
         {
             //var (success, position) = Helpers.MousePositionToIsometric(mainCamera, mousePosition, groundMask,weapon.transform.position.y);
-            float y = GunSelector.ActiveGun.GetComponentInChildren<ParticleSystem>().transform.position.y;
+            float y = equipmentManager.ActiveGun.GetComponentInChildren<ParticleSystem>().transform.position.y;
             var (success, position) = Helpers.MousePositionToIsometric(mainCamera, mousePosition, groundMask,y);
             
             if (success)
@@ -117,42 +89,6 @@ public class PlayerAimController : MonoBehaviour
         }
     }
 
-
-    void Fire()
-    {
-        bool firePressed = fireAction.IsPressed();
-
-        if (firePressed && GunSelector.ActiveGun != null)
-        {
-            Aim();
-            //weapon.StartFiring();
-        }
-        GunSelector.ActiveGun.GetComponent<Gun>().Tick(firePressed);
-
-    }
-
-    void Reload()
-    {
-        bool reloadPressed = reloadAction.IsPressed();
-
-        if (reloadPressed && !isReloading && GunSelector.ActiveGun.GetComponent<Gun>().CanReload())
-        {
-            GunSelector.ActiveGun.GetComponent<Gun>().StartReloading();
-            isReloading = true;
-            animator.SetTrigger("Reload");
-            //have to change ik0,0
-
-        }
-    }
-
-    public void EndReload()
-    {
-        isReloading = false;
-        GunSelector.ActiveGun.GetComponent<Gun>().Reload();
-        //have to change ik
-
-    }
-
     void HandleAnimations()
     {
         // Update aim weights
@@ -161,8 +97,6 @@ public class PlayerAimController : MonoBehaviour
 
         animator.SetLayerWeight(aimingLayerIndexLower, currentAimWeight);
         animator.SetLayerWeight(aimingLayerIndexUpper, currentAimWeight);
-
-        animator.SetLayerWeight(reloadingLayerIndexUpper, isReloading ? 1f : 0f);
     }
 
 }

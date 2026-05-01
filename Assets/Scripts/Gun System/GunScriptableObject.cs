@@ -15,7 +15,7 @@ public class GunScriptableObject : ScriptableObject
     public ImpactType ImpactType;
     public GunType Type;
     public string Name;
-    public GameObject ModelPrefab;
+    public GameObject GunPrefab;
     public Vector3 SpawnPoint;
     public Vector3 SpawnRotation;
 
@@ -24,18 +24,4 @@ public class GunScriptableObject : ScriptableObject
     public ShootConfigurationScriptableObject ShootConfig;
     public TrailConfigurationScriptableObject TrailConfig;
     public AudioConfigurationScriptableObject AudioConfig;
-
-
-    public GameObject Spawn(Transform Parent)
-    {
-        GameObject Model = Instantiate(ModelPrefab);
-        Model.transform.SetParent(Parent, false);
-        Model.transform.localPosition = SpawnPoint;
-        Model.transform.localRotation = Quaternion.Euler(SpawnRotation);
-        Gun gun = Model.AddComponent<Gun>();
-        gun.Initialize(this);
-
-        return Model;
-
-    }
 }

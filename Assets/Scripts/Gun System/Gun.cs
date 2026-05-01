@@ -8,12 +8,38 @@ public enum GunState
     Equipping
 }
 
+[System.Serializable]
+public class GunReferences
+{
+    public Transform Muzzle;
+
+    [Header("IK References")]
+    public Transform Grip;
+    public Transform Trigger;
+    public Transform Magazine;
+
+}
+
 public class Gun : MonoBehaviour
 {
     public GunScriptableObject gunData;
 
+    [Space]
+    public GunReferences References;
+
+    [Space]
+    [Header("Ammo")]
     public int CurrentAmmo;
     public int CurrentClipAmmo;
+
+
+    //Events
+
+    public System.Action OnReloadStarted;
+    public System.Action OnReloadFinished;
+    public System.Action<int, int> OnAmmoChanged;
+
+    //Private Parameters
 
     private GunState currentState = GunState.Idle;
 
@@ -39,6 +65,8 @@ public class Gun : MonoBehaviour
     {
         CurrentAmmo = gunData.AmmoConfig.MaxAmmo;
         CurrentClipAmmo = gunData.AmmoConfig.ClipSize;
+
+        OnAmmoChanged?.Invoke(CurrentClipAmmo, CurrentAmmo);
     }
 
 #endregion
@@ -47,10 +75,19 @@ public class Gun : MonoBehaviour
 
     public void StartReloading()
     {
+        OnReloadStarted?.Invoke();
         gunData.AudioConfig.PlayReloadClip(ShootingAudioSource);
     }
 
-    public void Reload()
+    public void FinishReload()
+    {
+        Reload();
+
+        OnReloadFinished?.Invoke();
+        OnAmmoChanged?.Invoke(CurrentClipAmmo, CurrentAmmo);
+    }
+
+    private void Reload()
     {
         int reloadAmount = Mathf.Min(gunData.AmmoConfig.ClipSize, CurrentAmmo);
         CurrentClipAmmo = reloadAmount;
@@ -94,6 +131,7 @@ public class Gun : MonoBehaviour
 
     private void TryStartShooting()
     {
+
         if (!CanShoot())
             return;
 
@@ -159,6 +197,7 @@ public class Gun : MonoBehaviour
 
 
         CurrentClipAmmo--;
+        OnAmmoChanged?.Invoke(CurrentClipAmmo, CurrentAmmo);
 
         if (Physics.Raycast(
             ShootSystem.transform.position,
@@ -186,6 +225,8 @@ public class Gun : MonoBehaviour
 
         int pellets = gunData.ShootConfig.PelletCount;
         CurrentClipAmmo--;
+        OnAmmoChanged?.Invoke(CurrentClipAmmo, CurrentAmmo);
+
 
         for (int i = 0; i < pellets; i++)
         {
@@ -273,13 +314,12 @@ public class Gun : MonoBehaviour
             gunData.TrailConfig.CreateTrail(gunData), 100
         );
 
-        ShootSystem = GetComponentInChildren<ParticleSystem>();
+        ShootSystem = References.Muzzle.GetComponentInChildren<ParticleSystem>();
         ShootingAudioSource = GetComponentInChildren<AudioSource>();
 
         targetPosition = transform.localPosition;
 
         InitializeAmmo();
-
     }
 
     // Update is called once per frame

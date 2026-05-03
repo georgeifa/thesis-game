@@ -6,6 +6,14 @@ public class PlayerInputManager : MonoBehaviour
 {
     private PlayerInput playerInput;
 
+    [SerializeField] private string aimActionName;
+    [SerializeField] private string mousePositionActionName;
+    [SerializeField] private string fireActionName;
+    [SerializeField] private string reloadActionName;
+    [SerializeField] private string weaponSwapActionName;
+
+
+
     private PlayerAimController aimController;
     private PlayerCombatController combatController;
     private PlayerControls movementController;
@@ -15,11 +23,13 @@ public class PlayerInputManager : MonoBehaviour
     private InputAction mousePosition;
     private InputAction fireAction;
     private InputAction reloadAction;
+    private InputAction scrollAction;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
     bool aimingPressed;
     bool firePressed;
     bool reloadPressed;
+    Vector2 scroll;
     void Start()
     {
         playerInput = GetComponent<PlayerInput>();
@@ -34,10 +44,11 @@ public class PlayerInputManager : MonoBehaviour
 
     void InitializeInputActions()
     {
-        aimAction = playerInput.actions["Aim"];
-        fireAction = playerInput.actions["Attack"];
-        reloadAction = playerInput.actions["Reload"];
-        mousePosition = playerInput.actions["Cursor Position"];       
+        aimAction = playerInput.actions[aimActionName];
+        fireAction = playerInput.actions[fireActionName];
+        reloadAction = playerInput.actions[reloadActionName];
+        mousePosition = playerInput.actions[mousePositionActionName];  
+        scrollAction = playerInput.actions[weaponSwapActionName];  
     }
 
     void ReadInput()
@@ -45,18 +56,25 @@ public class PlayerInputManager : MonoBehaviour
         aimingPressed = aimAction.IsPressed();
         firePressed = fireAction.IsPressed();
         reloadPressed = reloadAction.IsPressed();
-
+        scroll = scrollAction.ReadValue<Vector2>();
     }
     // Update is called once per frame
     void Update()
     {
         ReadInput();
 
-        combatController.Reload(reloadPressed);
-        if (!combatController.currentState.Equals(CombatState.Reloading))
-        {
-            aimController.Aim(aimingPressed || firePressed,mousePosition);
-            combatController.Fire(firePressed,mousePosition);
-        }
+        if(reloadPressed)
+            combatController.SetReload();
+            
+        aimController.Aim(aimingPressed || firePressed,mousePosition);
+        combatController.SetFire(firePressed);
+
+        if(scroll.y != 0)
+            combatController.ToggleWeapon();
+    }
+
+    public InputAction GetMousePosition()
+    {
+        return mousePosition;
     }
 }

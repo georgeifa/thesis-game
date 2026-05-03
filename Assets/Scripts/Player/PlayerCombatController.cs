@@ -1,6 +1,8 @@
+using System.Collections;
 using MyBox;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering.Universal;
 
 
 public enum CombatState
@@ -18,13 +20,28 @@ public class PlayerCombatController : MonoBehaviour
 
     private Animator animator;
 
+    private Gun activeGun;
     private PlayerAimController aimController;
     private PlayerEquipmentManager equipmentManager;
+    private PlayerInputManager inputManager;
 
-    private Gun activeGun;
+
+    private bool wantsToShoot;
+    private bool reloadPressed;
+    private bool switchPressed;
+    private EquipmentSlot nextSlot;
+
+    // timing
+    [SerializeField] private float equipTime = 0.4f;
+
+    [SerializeField] private float switchCooldown = 0.15f;
+
+    // for semi-auto behavior
+    private bool wasHoldingFireLastFrame;
 
     private int reloadingLayerIndexUpper;
 
+#region Initializations
     private void Awake()
     {
         InitializeComponents();
@@ -39,6 +56,15 @@ public class PlayerCombatController : MonoBehaviour
         if (equipmentManager == null)
         {
             Debug.LogError("PlayerEquipment is missing!");
+            return;
+        }
+
+        if (inputManager == null)
+            inputManager = GetComponent<PlayerInputManager>();
+
+        if (inputManager == null)
+        {
+            Debug.LogError("PlayerInputManager is missing!");
             return;
         }
 
@@ -61,6 +87,177 @@ public class PlayerCombatController : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        reloadingLayerIndexUpper = animator.GetLayerIndex("Reloading");
+
+        if (equipmentManager.ActiveGun != null)
+        {
+            HandleGunChanged(equipmentManager.ActiveGun.GetComponent<Gun>());
+        }
+    }
+
+#endregion
+
+#region Input Calls
+
+    public void SetFire(bool pressed)
+    {
+        wantsToShoot = pressed;
+    }
+
+    public void SetReload()
+    {
+        reloadPressed = true;
+    }
+
+    #endregion
+
+    private void Update()
+    {
+        HandleState();
+        UpdateGun();
+
+        reloadPressed = false;
+        switchPressed = false;
+
+        wasHoldingFireLastFrame = wantsToShoot;
+    }
+
+    private void UpdateGun()
+    {
+        if (activeGun == null) return;
+
+        bool allowShooting = currentState == CombatState.Shooting;
+
+        activeGun.Tick(allowShooting);
+    }
+
+    private void HandleState()
+    {
+        switch (currentState)
+        {
+            case CombatState.None:
+                SetState(CombatState.Idle);
+                break;
+
+            case CombatState.Idle:
+                HandleIdle();
+                break;
+
+            case CombatState.Shooting:
+                HandleShooting();
+                break;
+
+            case CombatState.Reloading:
+                HandleReloading();
+                break;
+
+            case CombatState.SwitchingWeapon:
+                // locked
+                break;
+        }
+    }
+
+    private void HandleIdle()
+    {
+        if (switchPressed)
+        {
+            StartCoroutine(SwitchRoutine());
+            return;
+        }
+
+        if (reloadPressed)
+        {
+            SetState(CombatState.Reloading);
+            return;
+        }
+
+        if (CanStartShooting())
+        {
+            SetState(CombatState.Shooting);
+        }
+    }
+
+    private void HandleShooting()
+    {
+        if (!wantsToShoot || !aimController.isAiming)
+        {
+            SetState(CombatState.Idle);
+            return;
+        }
+
+        if (reloadPressed)
+        {
+            SetState(CombatState.Reloading);
+            return;
+        }
+
+        if (switchPressed)
+        {
+            StartCoroutine(SwitchRoutine());
+            return;
+        }
+    }
+
+    private void HandleReloading()
+    {
+        if (activeGun != null && !activeGun.IsReloading)
+        {
+            SetState(CombatState.Idle);
+            return;
+        }
+
+        if (wantsToShoot && aimController.isAiming)
+        {
+            CancelReload();
+            SetState(CombatState.Shooting);
+            return;
+        }
+
+        if (switchPressed)
+        {
+            CancelReload();
+            StartCoroutine(SwitchRoutine());
+            return;
+        }
+    }
+
+    private void SetState(CombatState newState)
+    {
+        if (currentState == newState) return;
+
+        ExitState(currentState);
+        currentState = newState;
+        EnterState(newState);
+    }
+
+    private void EnterState(CombatState state)
+    {
+        switch (state)
+        {
+            case CombatState.Shooting:
+                break;
+
+            case CombatState.Reloading:
+                Reload();
+                break;
+
+            case CombatState.SwitchingWeapon:
+                activeGun?.ForceStop();
+                break;
+        }
+    }
+
+    private void ExitState(CombatState state)
+    {
+        switch (state)
+        {
+            case CombatState.Shooting:
+                activeGun?.ForceStop();
+                break;
+        }
+    }
     private void OnDestroy()
     {
         if (equipmentManager != null)
@@ -74,16 +271,37 @@ public class PlayerCombatController : MonoBehaviour
         }
     }
 
+#region Weapon Switching
+
+    public void ToggleWeapon()
+    {
+        if (currentState == CombatState.SwitchingWeapon)
+            return;
+
+        EquipmentSlot next = equipmentManager.GetNextWeaponSlot();
+
+        if (!equipmentManager.CanSwitchTo(next))
+            return;
+
+        RequestSwitch(next);
+    }
+
+    private void RequestSwitch(EquipmentSlot slot)
+    {
+        switchPressed = true;
+        nextSlot = slot;
+    }
+
     private void HandleGunChanged(Gun newGun)
     {
         if (activeGun != null)
-    {
-        activeGun.OnReloadStarted -= HandleReloadStarted;
-        activeGun.OnReloadFinished -= HandleReloadFinished;
-        activeGun.OnAmmoChanged -= HandleAmmoChanged;
-    }
+        {
+            activeGun.OnReloadStarted -= HandleReloadStarted;
+            activeGun.OnReloadFinished -= HandleReloadFinished;
+            activeGun.OnAmmoChanged -= HandleAmmoChanged;
+        }
 
-        activeGun = newGun;
+            activeGun = newGun;
 
         if (activeGun == null) return;
 
@@ -93,23 +311,22 @@ public class PlayerCombatController : MonoBehaviour
         activeGun.OnAmmoChanged += HandleAmmoChanged;
     }
 
-    private void HandleReloadStarted()
+    private IEnumerator SwitchRoutine()
     {
-        Debug.Log("Reload started");
+        SetState(CombatState.SwitchingWeapon);
 
-        currentState = CombatState.Reloading;
+        activeGun?.ForceStop();
 
-        // later: trigger animation
+        wasHoldingFireLastFrame = true;
 
-        activeGun.FinishReload();
+        yield return new WaitForSeconds(equipTime);
+
+        equipmentManager.SwitchTo(nextSlot);
+
+        SetState(CombatState.Idle);
     }
 
-    private void HandleReloadFinished()
-    {
-        Debug.Log("Reload finished");
-
-        currentState = CombatState.Idle;
-    }
+#endregion
 
     private void HandleAmmoChanged(int clip, int total)
     {
@@ -118,60 +335,84 @@ public class PlayerCombatController : MonoBehaviour
         // later: update UI
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+#region Shooting
+
+    public void Fire()
     {
-        reloadingLayerIndexUpper = animator.GetLayerIndex("Reloading");
-
-        if (equipmentManager.ActiveGun != null)
-        {
-            HandleGunChanged(equipmentManager.ActiveGun.GetComponent<Gun>());
-        }
-    }
-
-
-    public void Fire(bool firePressed, InputAction mousePosition)
-    {
+        InputAction mousePosition = inputManager.GetMousePosition();
         if (activeGun == null)
         {
             Debug.LogWarning("No active gun yet");
             return;
         }
 
-        if (firePressed && equipmentManager.ActiveGun != null)
+        if (wantsToShoot && equipmentManager.ActiveGun != null)
         {
-            aimController.Aim(firePressed,mousePosition);
+            aimController.Aim(wantsToShoot,mousePosition);
             //weapon.StartFiring();
         }
 
-        equipmentManager.ActiveGun.GetComponent<Gun>().Tick(firePressed);
+        equipmentManager.ActiveGun.GetComponent<Gun>().Tick(wantsToShoot);
     }
 
-    public void Reload(bool reloadPressed)
+    private bool CanStartShooting()
     {
-        if (reloadPressed && !currentState.Equals(CombatState.Reloading) && equipmentManager.ActiveGun.GetComponent<Gun>().CanReload())
+        if (!wantsToShoot) return false;
+
+        // require new click after swap
+        if (wasHoldingFireLastFrame) return false;
+
+        return true;
+    }
+
+#endregion
+
+#region Reload
+
+    private void HandleReloadStarted()
+    {
+        Debug.Log("Reload started");
+
+        // later: trigger animation
+
+        EndReload();
+    }
+
+    public void Reload()
+    {
+        if (reloadPressed && activeGun != null && activeGun.CanReload())
         {
-            equipmentManager.ActiveGun.GetComponent<Gun>().StartReloading();
+            reloadPressed = false;
+            activeGun.StartReloading();
             animator.SetTrigger("Reload");
             //have to change ik0,0
         }
     }
 
+    private void CancelReload()
+    {
+        if (activeGun == null) return;
+
+        activeGun.CancelReload();   // tell gun to stop animation/process
+    }
+
+    private void HandleReloadFinished()
+    {
+        Debug.Log("Reload finished");
+
+        SetState(CombatState.Idle);
+    }
+
     public void EndReload()
     {
-        equipmentManager.ActiveGun.GetComponent<Gun>().FinishReload();
+        activeGun.FinishReload();
         //have to change ik
-
     }
+
+#endregion
 
     void HandleAnimations()
     {
         animator.SetLayerWeight(reloadingLayerIndexUpper, currentState.Equals(CombatState.Reloading) ? 1f : 0f);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

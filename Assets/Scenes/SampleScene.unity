@@ -3819,7 +3819,6 @@ MonoBehaviour:
   Secondary: {fileID: 11400000, guid: e10ffcf5cee60bb479a6e77fde82e617, type: 2}
   weaponParent: {fileID: 1905888955}
   ActiveGun: {fileID: 0}
-  Gun: 1
   Grip: {fileID: 1040876445}
   Trigger: {fileID: 1904689161}
 --- !u!114 &1843514419
@@ -3847,7 +3846,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b4a78d40fe4c9447ae8e0c68f892b83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  isReloading: 0
+  currentState: 0
+  equipTime: 0.4
+  switchCooldown: 0.15
 --- !u!114 &1843514421
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3860,6 +3861,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a60552e83d5987e428a61ea2f24d1ec3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  aimActionName: Aim
+  mousePositionActionName: Cursor Position
+  fireActionName: Attack
+  reloadActionName: Reload
+  weaponSwapActionName: Scroll Weapon
 --- !u!1 &1904689160
 GameObject:
   m_ObjectHideFlags: 0

@@ -88,6 +88,18 @@ public class PlayerEquipmentManager : MonoBehaviour
             }
     }
 
+    public EquipmentSlot GetNextWeaponSlot()
+    {
+        return currentSlot == EquipmentSlot.Primary
+            ? EquipmentSlot.Secondary
+            : EquipmentSlot.Primary;
+    }
+
+    public bool CanSwitchTo(EquipmentSlot slot)
+    {
+        return slot != currentSlot && equippedGuns.ContainsKey(slot);
+    }
+
     private void Update()
     {
         if (ActiveGun != null)

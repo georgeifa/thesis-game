@@ -31,6 +31,7 @@ public class Gun : MonoBehaviour
     [Header("Ammo")]
     public int CurrentAmmo;
     public int CurrentClipAmmo;
+    public bool IsReloading { get; private set; }
 
 
     //Events
@@ -38,7 +39,6 @@ public class Gun : MonoBehaviour
     public System.Action OnReloadStarted;
     public System.Action OnReloadFinished;
     public System.Action<int, int> OnAmmoChanged;
-
     //Private Parameters
 
     private GunState currentState = GunState.Idle;
@@ -75,12 +75,15 @@ public class Gun : MonoBehaviour
 
     public void StartReloading()
     {
+        IsReloading = true;
         OnReloadStarted?.Invoke();
         gunData.AudioConfig.PlayReloadClip(ShootingAudioSource);
     }
 
     public void FinishReload()
     {
+        IsReloading = false;
+
         Reload();
 
         OnReloadFinished?.Invoke();
@@ -92,6 +95,13 @@ public class Gun : MonoBehaviour
         int reloadAmount = Mathf.Min(gunData.AmmoConfig.ClipSize, CurrentAmmo);
         CurrentClipAmmo = reloadAmount;
         CurrentAmmo -= reloadAmount;
+    }
+
+    public void CancelReload()
+    {
+        IsReloading = false;
+
+        // stop reload animation later if needed
     }
 
     public bool CanReload()
@@ -322,9 +332,9 @@ public class Gun : MonoBehaviour
         InitializeAmmo();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void ForceStop()
     {
-        
+        if (ShootSystem != null && ShootSystem.isPlaying)
+            ShootSystem.Stop();
     }
 }

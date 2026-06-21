@@ -71,5 +71,6 @@ AssetOrigin:
   productId: 127325
   packageName: Particle Pack
   packageVersion: 3.1
-  assetPath: Assets/UnityTechnologies/ParticlePack/EffectExamples/Weapon Effects/Textures/GoopSprayAlbedo.tif
-  uploadId: 691001
+  assetPath: Assets/Imported/UnityTechnologies/ParticlePack/EffectExamples/Weapon
+    Effects/Textures/GoopSprayAlbedo.tif
+  uploadId: 896138

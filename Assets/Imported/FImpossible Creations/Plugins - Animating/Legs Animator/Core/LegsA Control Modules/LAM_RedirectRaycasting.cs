@@ -16,7 +16,7 @@ namespace FIMSpace.FProceduralAnimation
             _LocalDirection = helper.RequestVariable("Rotate Raycast", new Vector3(75f, 0f, 0f));
         }
 
-        public override void OnUpdate(LegsAnimator.LegsAnimatorCustomModuleHelper helper)
+        public override void OnAfterAnimatorCaptureUpdate( LegsAnimator.LegsAnimatorCustomModuleHelper helper)
         {
             Quaternion rot = Quaternion.Euler(_LocalDirection.GetVector3());
             Matrix4x4 mx = Matrix4x4.TRS(LA.BaseTransform.position, rot * LA.BaseTransform.rotation, LA.BaseTransform.lossyScale);

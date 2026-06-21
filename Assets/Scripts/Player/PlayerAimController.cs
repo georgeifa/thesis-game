@@ -11,6 +11,7 @@ public class PlayerAimController : MonoBehaviour
 {
     private PlayerEquipmentManager equipmentManager;
 
+
     // Cached components
     private Animator animator;
     private Camera mainCamera;
@@ -39,7 +40,6 @@ public class PlayerAimController : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         equipmentManager = GetComponent<PlayerEquipmentManager>();
-
         
         //weapon = GetComponentInChildren<RaycastWeapon>();
         mainCamera = Camera.main; // Cache Camera.main
@@ -78,6 +78,7 @@ public class PlayerAimController : MonoBehaviour
                     transform.forward = Vector3.Slerp(transform.forward, direction, rotationTimeAim * Time.deltaTime);
                 }
 
+                
                 isAiming = true;
                 aimingRig.weight = Mathf.MoveTowards(aimingRig.weight, 1, Time.deltaTime * aimDuration);
             }

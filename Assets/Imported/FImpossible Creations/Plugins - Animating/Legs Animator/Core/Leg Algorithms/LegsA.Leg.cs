@@ -17,6 +17,7 @@ namespace FIMSpace.FProceduralAnimation
             public LegsAnimator Owner;
             public int PlaymodeIndex { get; private set; }
 
+            /// <summary> When you modify this value through code, remember to call IK_UpdateParamsBase(); OR IK_UpdateParams(); after that. </summary>
             [FPD_Suffix(0f, 1f)]
             public float LegBlendWeight = 1f;
 

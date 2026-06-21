@@ -119,6 +119,11 @@ namespace FIMSpace.FTools
             return Vector3.LerpUnclamped(sourceAnimationPosition, target, blend);
         }
 
+        public Quaternion GetTargetRotation()
+        {
+            return GetTargetRotation(elChild.ProceduralPosition, transform.TransformDirection(elChild.transform.localPosition), ProceduralPosition);
+        }
+
         public Quaternion GetTargetRotation(Vector3 lookPos, Vector3 localOffset, float blending)
         {
             return Quaternion.FromToRotation(localOffset, (lookPos - BlendVector(ProceduralPosition, blending)).normalized) * transform.rotation;

@@ -24,6 +24,7 @@ public class PlayerCombatController : MonoBehaviour
     private PlayerAimController aimController;
     private PlayerEquipmentManager equipmentManager;
     private PlayerInputManager inputManager;
+    private PlayerAnimationsManager animationsManager;
 
 
     private bool wantsToShoot;
@@ -33,13 +34,10 @@ public class PlayerCombatController : MonoBehaviour
 
     // timing
     [SerializeField] private float equipTime = 0.4f;
-
     [SerializeField] private float switchCooldown = 0.15f;
 
     // for semi-auto behavior
     private bool wasHoldingFireLastFrame;
-
-    private int reloadingLayerIndexUpper;
 
 #region Initializations
     private void Awake()
@@ -52,66 +50,38 @@ public class PlayerCombatController : MonoBehaviour
     {
         if (equipmentManager == null)
             equipmentManager = GetComponent<PlayerEquipmentManager>();
-
-        if (equipmentManager == null)
-        {
-            Debug.LogError("PlayerEquipment is missing!");
-            return;
-        }
+        if (equipmentManager == null) { Debug.LogError("PlayerEquipment is missing!"); return; }
 
         if (inputManager == null)
             inputManager = GetComponent<PlayerInputManager>();
-
-        if (inputManager == null)
-        {
-            Debug.LogError("PlayerInputManager is missing!");
-            return;
-        }
+        if (inputManager == null) { Debug.LogError("PlayerInputManager is missing!"); return; }
 
         if (aimController == null)
             aimController = GetComponent<PlayerAimController>();
-
-        if (aimController == null)
-        {
-            Debug.LogError("PlayerAimController is missing!");
-            return;
-        }
+        if (aimController == null) { Debug.LogError("PlayerAimController is missing!"); return; }
 
         if (animator == null)
             animator = GetComponent<Animator>();
+        if (animator == null) { Debug.LogError("Animator is missing!"); return; }
 
-        if (animator == null)
-        {
-            Debug.LogError("Animator is missing!");
-            return;
-        }
+        if (animationsManager == null)
+            animationsManager = GetComponent<PlayerAnimationsManager>();
+        if (animationsManager == null) { Debug.LogError("PlayerAnimationsManager is missing!"); return; }
     }
 
     void Start()
     {
-        reloadingLayerIndexUpper = animator.GetLayerIndex("Reloading");
-
         if (equipmentManager.ActiveGun != null)
-        {
             HandleGunChanged(equipmentManager.ActiveGun.GetComponent<Gun>());
-        }
     }
-
 #endregion
 
 #region Input Calls
 
-    public void SetFire(bool pressed)
-    {
-        wantsToShoot = pressed;
-    }
+    public void SetFire(bool pressed) => wantsToShoot = pressed;
+    public void SetReload()           => reloadPressed = true;
 
-    public void SetReload()
-    {
-        reloadPressed = true;
-    }
-
-    #endregion
+#endregion
 
     private void Update()
     {
@@ -129,7 +99,6 @@ public class PlayerCombatController : MonoBehaviour
         if (activeGun == null) return;
 
         bool allowShooting = currentState == CombatState.Shooting;
-
         activeGun.Tick(allowShooting);
     }
 
@@ -137,77 +106,36 @@ public class PlayerCombatController : MonoBehaviour
     {
         switch (currentState)
         {
-            case CombatState.None:
-                SetState(CombatState.Idle);
-                break;
-
-            case CombatState.Idle:
-                HandleIdle();
-                break;
-
-            case CombatState.Shooting:
-                HandleShooting();
-                break;
-
-            case CombatState.Reloading:
-                HandleReloading();
-                break;
-
-            case CombatState.SwitchingWeapon:
-                // locked
-                break;
+            case CombatState.None:            SetState(CombatState.Idle); break;
+            case CombatState.Idle:            HandleIdle();               break;
+            case CombatState.Shooting:        HandleShooting();           break;
+            case CombatState.Reloading:       HandleReloading();          break;
+            case CombatState.SwitchingWeapon: /* locked */                break;
         }
     }
 
     private void HandleIdle()
     {
-        if (switchPressed)
-        {
-            StartCoroutine(SwitchRoutine());
-            return;
-        }
-
-        if (reloadPressed)
-        {
-            SetState(CombatState.Reloading);
-            return;
-        }
-
-        if (CanStartShooting())
-        {
-            SetState(CombatState.Shooting);
-        }
+        if (switchPressed)      { StartCoroutine(SwitchRoutine()); return; }
+        if (reloadPressed)      { SetState(CombatState.Reloading); return; }
+        if (CanStartShooting()) { SetState(CombatState.Shooting);       }
     }
 
     private void HandleShooting()
     {
-        if (!wantsToShoot || !aimController.isAiming)
-        {
-            SetState(CombatState.Idle);
-            return;
-        }
-
-        if (reloadPressed)
-        {
-            SetState(CombatState.Reloading);
-            return;
-        }
-
-        if (switchPressed)
-        {
-            StartCoroutine(SwitchRoutine());
-            return;
-        }
+        if (!wantsToShoot || !aimController.isAiming) { SetState(CombatState.Idle);      return; }
+        if (reloadPressed)                            { SetState(CombatState.Reloading); return; }
+        if (switchPressed)                            { StartCoroutine(SwitchRoutine()); return; }
     }
 
     private void HandleReloading()
     {
-        if (activeGun != null && !activeGun.IsReloading)
-        {
-            SetState(CombatState.Idle);
-            return;
-        }
+        // NOTE: the Reloading -> Idle exit is owned by the animation event
+        // OnReloadAnimationEnd() (Frame O). We do NOT exit here based on the
+        // gun's IsReloading flag, because ammo is refilled mid-animation at
+        // Frame E and that would cut the animation short.
 
+        // Interrupt: shooting cancels the reload (Helldivers behaviour)
         if (wantsToShoot && aimController.isAiming)
         {
             CancelReload();
@@ -215,6 +143,7 @@ public class PlayerCombatController : MonoBehaviour
             return;
         }
 
+        // Interrupt: weapon switch cancels the reload
         if (switchPressed)
         {
             CancelReload();
@@ -240,7 +169,7 @@ public class PlayerCombatController : MonoBehaviour
                 break;
 
             case CombatState.Reloading:
-                Reload();
+                StartReload();
                 break;
 
             case CombatState.SwitchingWeapon:
@@ -258,30 +187,23 @@ public class PlayerCombatController : MonoBehaviour
                 break;
         }
     }
+
     private void OnDestroy()
     {
         if (equipmentManager != null)
             equipmentManager.OnGunChanged -= HandleGunChanged;
 
-        if (activeGun != null)
-        {
-            activeGun.OnReloadStarted -= HandleReloadStarted;
-            activeGun.OnReloadFinished -= HandleReloadFinished;
-            activeGun.OnAmmoChanged -= HandleAmmoChanged;
-        }
+        UnsubscribeGunEvents();
     }
 
 #region Weapon Switching
 
     public void ToggleWeapon()
     {
-        if (currentState == CombatState.SwitchingWeapon)
-            return;
+        if (currentState == CombatState.SwitchingWeapon) return;
 
         EquipmentSlot next = equipmentManager.GetNextWeaponSlot();
-
-        if (!equipmentManager.CanSwitchTo(next))
-            return;
+        if (!equipmentManager.CanSwitchTo(next)) return;
 
         RequestSwitch(next);
     }
@@ -294,21 +216,22 @@ public class PlayerCombatController : MonoBehaviour
 
     private void HandleGunChanged(Gun newGun)
     {
-        if (activeGun != null)
-        {
-            activeGun.OnReloadStarted -= HandleReloadStarted;
-            activeGun.OnReloadFinished -= HandleReloadFinished;
-            activeGun.OnAmmoChanged -= HandleAmmoChanged;
-        }
+        UnsubscribeGunEvents();
 
-            activeGun = newGun;
-
+        activeGun = newGun;
         if (activeGun == null) return;
 
-        // subscribe to new gun
-        activeGun.OnReloadStarted += HandleReloadStarted;
+        activeGun.OnReloadStarted  += HandleReloadStarted;
         activeGun.OnReloadFinished += HandleReloadFinished;
-        activeGun.OnAmmoChanged += HandleAmmoChanged;
+        activeGun.OnAmmoChanged    += HandleAmmoChanged;
+    }
+
+    private void UnsubscribeGunEvents()
+    {
+        if (activeGun == null) return;
+        activeGun.OnReloadStarted  -= HandleReloadStarted;
+        activeGun.OnReloadFinished -= HandleReloadFinished;
+        activeGun.OnAmmoChanged    -= HandleAmmoChanged;
     }
 
     private IEnumerator SwitchRoutine()
@@ -316,7 +239,6 @@ public class PlayerCombatController : MonoBehaviour
         SetState(CombatState.SwitchingWeapon);
 
         activeGun?.ForceStop();
-
         wasHoldingFireLastFrame = true;
 
         yield return new WaitForSeconds(equipTime);
@@ -331,7 +253,6 @@ public class PlayerCombatController : MonoBehaviour
     private void HandleAmmoChanged(int clip, int total)
     {
         Debug.Log($"Ammo: {clip}/{total}");
-
         // later: update UI
     }
 
@@ -347,21 +268,15 @@ public class PlayerCombatController : MonoBehaviour
         }
 
         if (wantsToShoot && equipmentManager.ActiveGun != null)
-        {
-            aimController.Aim(wantsToShoot,mousePosition);
-            //weapon.StartFiring();
-        }
+            aimController.Aim(wantsToShoot, mousePosition);
 
         equipmentManager.ActiveGun.GetComponent<Gun>().Tick(wantsToShoot);
     }
 
     private bool CanStartShooting()
     {
-        if (!wantsToShoot) return false;
-
-        // require new click after swap
-        if (wasHoldingFireLastFrame) return false;
-
+        if (!wantsToShoot)           return false;
+        if (wasHoldingFireLastFrame) return false; // require a fresh click after swap
         return true;
     }
 
@@ -369,50 +284,63 @@ public class PlayerCombatController : MonoBehaviour
 
 #region Reload
 
-    private void HandleReloadStarted()
+    /// <summary>
+    /// Called by EnterState when entering Reloading.
+    /// Starts the gun's reload process and triggers the animation.
+    /// If the gun can't reload, drops straight back to Idle.
+    ///
+    /// IMPORTANT: Gun.StartReloading() must NOT auto-finish on a timer.
+    /// The reload is now driven entirely by animation events:
+    ///   - ammo refills at Frame E  (OnNewMagGrabbed -> FinishReload)
+    ///   - state exits at Frame O   (OnReloadAnimationEnd)
+    /// </summary>
+    private void StartReload()
     {
-        Debug.Log("Reload started");
-
-        // later: trigger animation
-
-        EndReload();
-    }
-
-    public void Reload()
-    {
-        if (reloadPressed && activeGun != null && activeGun.CanReload())
+        if (activeGun == null || !activeGun.CanReload())
         {
-            reloadPressed = false;
-            activeGun.StartReloading();
-            animator.SetTrigger("Reload");
-            //have to change ik0,0
+            SetState(CombatState.Idle);
+            return;
         }
+
+        activeGun.StartReloading();
+        animationsManager.TriggerReload();
     }
 
+    /// <summary>
+    /// Animation event (Frame E) via PlayerAnimationsManager.
+    /// The new mag has been seated — refill ammo now so it counts
+    /// even if the rest of the animation is interrupted.
+    /// </summary>
+    public void OnNewMagGrabbed()
+    {
+        activeGun?.FinishReload();
+    }
+
+    /// <summary>
+    /// Animation event (Frame O) via PlayerAnimationsManager.
+    /// The reload animation is fully complete — return to Idle.
+    /// </summary>
+    public void OnReloadAnimationEnd()
+    {
+        if (currentState == CombatState.Reloading)
+            SetState(CombatState.Idle);
+    }
+
+    /// <summary>
+    /// Cancels an in-progress reload (interrupted by shoot or switch).
+    /// Tells the gun to abort and resets all reload rig weights so the
+    /// gun snaps back to the hands instead of staying glued mid-animation.
+    /// </summary>
     private void CancelReload()
     {
-        if (activeGun == null) return;
-
-        activeGun.CancelReload();   // tell gun to stop animation/process
+        activeGun?.CancelReload();
+        animationsManager.AbortReload();
     }
 
-    private void HandleReloadFinished()
-    {
-        Debug.Log("Reload finished");
-
-        SetState(CombatState.Idle);
-    }
-
-    public void EndReload()
-    {
-        activeGun.FinishReload();
-        //have to change ik
-    }
+    // Gun event callbacks — logging only.
+    // State transitions are owned by the animation events above.
+    private void HandleReloadStarted()  => Debug.Log("Reload started");
+    private void HandleReloadFinished() => Debug.Log("Reload finished");
 
 #endregion
-
-    void HandleAnimations()
-    {
-        animator.SetLayerWeight(reloadingLayerIndexUpper, currentState.Equals(CombatState.Reloading) ? 1f : 0f);
-    }
-}
+} 

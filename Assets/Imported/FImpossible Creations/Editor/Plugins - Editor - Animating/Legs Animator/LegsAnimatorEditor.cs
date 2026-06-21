@@ -13,6 +13,7 @@ namespace FIMSpace.FProceduralAnimation
         private LegsAnimator _get;
 
         protected bool _requestRepaint = false;
+        protected virtual bool DrawOptimizationButton { get { return true; } }
 
         public override bool UseDefaultMargins()
         {
@@ -66,7 +67,7 @@ namespace FIMSpace.FProceduralAnimation
 
         System.DateTime _lastUpdateTime = new System.DateTime();
         float _editorDelta = 0.1f;
-        void UpdateDelta()
+        protected void UpdateDelta()
         {
             if( Event.current.type == EventType.Repaint )
             {
@@ -261,7 +262,7 @@ namespace FIMSpace.FProceduralAnimation
                     DrawCategoryButton( LegsAnimator.EEditorSetupCategory.Main, FGUI_Resources.Tex_GearMain, "Main" );
                     DrawCategoryButton( LegsAnimator.EEditorSetupCategory.Physics, FGUI_Resources.Tex_Physics, "Detection" );
                     DrawCategoryButton( LegsAnimator.EEditorSetupCategory.IK, Tex_IK, "IK" );
-                    DrawCategoryButton( LegsAnimator.EEditorSetupCategory.Optimizing, FGUI_Resources.TexSmallOptimizeIcon, "Optimizing", 32 );
+                    if (DrawOptimizationButton) DrawCategoryButton(LegsAnimator.EEditorSetupCategory.Optimizing, FGUI_Resources.TexSmallOptimizeIcon, "Optimizing", 32);
                     EditorGUILayout.EndHorizontal();
                     GUILayout.Space( 5 );
                     FGUI_Inspector.DrawUILineCommon( 1 );

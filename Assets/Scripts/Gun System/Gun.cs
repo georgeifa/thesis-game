@@ -12,12 +12,12 @@ public enum GunState
 public class GunReferences
 {
     public Transform Muzzle;
-
+    public GameObject MagazineModel;
+    public Transform MagSocket;          
+ 
     [Header("IK References")]
-    public Transform Grip;
-    public Transform Trigger;
-    public Transform Magazine;
-
+    public Transform Grip;               // ref_grip    — right hand IK target
+    public Transform Trigger;            // ref_trigger — trigger hand IK target
 }
 
 public class Gun : MonoBehaviour

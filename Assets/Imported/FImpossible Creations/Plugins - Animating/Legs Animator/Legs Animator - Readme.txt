@@ -1,7 +1,7 @@
 __________________________________________________________________________________________
 
 Package "Legs Animator"
-Version 1.0.4.4.2
+Version 1.0.4.6.1
 
 Made by FImpossible Creations - Filip Moeglich
 http://fimpossiblecreations.pl
@@ -61,10 +61,16 @@ Check Manual for more
 
 __________________________________________________________________________________________
 
-Version 1.0.4.4.2
-- Fix: When using 'Keep Attached' No Raycast Behaviour mode, foot will use feet rotation angle limits
+Version 1.0.4.6.1
+- Code preparation for the Full Body extension 
 
-Version 1.0.4.4.1
+Version 1.0.4.6
+- Added possibility to change raycast start height position for each raycast origin type
+
+Version 1.0.4.5
+- Fixed "Redirect Raycasting" module to be called in proper order
+- Updated custom .Up axis algorithm (used when LocalWorldUp mode is off)
+- Fix: When using 'Keep Attached' No Raycast Behaviour mode, foot will use feet rotation angle limits
 - Fix: legs IK floor level refresh when doing ik setup on the rotated model
 
 Version 1.0.4.4

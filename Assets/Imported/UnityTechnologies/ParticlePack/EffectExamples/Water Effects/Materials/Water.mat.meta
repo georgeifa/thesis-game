@@ -11,5 +11,6 @@ AssetOrigin:
   productId: 127325
   packageName: Particle Pack
   packageVersion: 3.1
-  assetPath: Assets/UnityTechnologies/ParticlePack/EffectExamples/Water Effects/Materials/Water.mat
-  uploadId: 691001
+  assetPath: Assets/Imported/UnityTechnologies/ParticlePack/EffectExamples/Water
+    Effects/Materials/Water.mat
+  uploadId: 896138

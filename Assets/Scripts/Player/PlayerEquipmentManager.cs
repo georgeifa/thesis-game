@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.Animations.Rigging;
 
 public enum EquipmentSlot
 {
@@ -11,9 +9,14 @@ public enum EquipmentSlot
     Grenade,
     Stratagem // future
 }
+
 [DisallowMultipleComponent]
 public class PlayerEquipmentManager : MonoBehaviour
 {
+    // ─────────────────────────────────────────────
+    //  Inspector References
+    // ─────────────────────────────────────────────
+
     [Header("Loadout")]
     public GunScriptableObject Primary;
     public GunScriptableObject Secondary;
@@ -21,38 +24,52 @@ public class PlayerEquipmentManager : MonoBehaviour
     [Header("Spawn")]
     [SerializeField] private Transform weaponParent;
 
+    [Header("IK Targets (persistent proxies on Player)")]
+    [SerializeField] private Transform Grip;       // follows ref_grip on active gun
+    [SerializeField] private Transform Trigger;    // follows ref_trigger on active gun
+
+    [Header("Scripted Action Attach Point")]
+    [SerializeField] private Transform handWeaponSocket; // empty child of the right hand bone
+
+    // ─────────────────────────────────────────────
+    //  Private State
+    // ─────────────────────────────────────────────
+
     private Dictionary<EquipmentSlot, Gun> equippedGuns = new();
     private EquipmentSlot currentSlot = EquipmentSlot.None;
 
-    public GameObject ActiveGun;
+    public GameObject ActiveGun { get; private set; }
 
     public System.Action<Gun> OnGunChanged;
 
-
-
-    [Space]
-    [Header("IK References")]
-    [SerializeField]
-    private Transform Grip;
-    [SerializeField]
-    private Transform Trigger;
-
-    //reference of the grip and trigger location on the gun
+    // Cached references from the active gun
     private Transform gripRef;
     private Transform triggerRef;
 
+    // ─────────────────────────────────────────────
+    //  Unity Lifecycle
+    // ─────────────────────────────────────────────
 
-    void Start()
+    private void Start()
     {
         EquipInitialLoadout();
         SwitchTo(EquipmentSlot.Primary);
-
-        CacheGunReferences();
     }
+
+    private void Update()
+    {
+        // Keep IK proxy transforms snapped to the active gun's reference points
+        if (gripRef    != null) Grip.SetPositionAndRotation(gripRef.position, gripRef.rotation);
+        if (triggerRef != null) Trigger.SetPositionAndRotation(triggerRef.position, triggerRef.rotation);
+    }
+
+    // ─────────────────────────────────────────────
+    //  Loadout
+    // ─────────────────────────────────────────────
 
     private void EquipInitialLoadout()
     {
-        EquipGun(Primary, EquipmentSlot.Primary);
+        EquipGun(Primary,   EquipmentSlot.Primary);
         EquipGun(Secondary, EquipmentSlot.Secondary);
     }
 
@@ -63,29 +80,35 @@ public class PlayerEquipmentManager : MonoBehaviour
         Gun gun = obj.GetComponent<Gun>();
         gun.Initialize(data);
 
-        obj.SetActive(false); // important
+        obj.SetActive(false);
 
         equippedGuns[slot] = gun;
     }
+
+    // ─────────────────────────────────────────────
+    //  Switching
+    // ─────────────────────────────────────────────
 
     public void SwitchTo(EquipmentSlot slot)
     {
         if (currentSlot == slot) return;
 
-            if (equippedGuns.TryGetValue(currentSlot, out Gun oldGun))
-            {
-                oldGun.gameObject.SetActive(false);
-            }
+        // Deactivate old gun
+        if (equippedGuns.TryGetValue(currentSlot, out Gun oldGun))
+            oldGun.gameObject.SetActive(false);
 
-            currentSlot = slot;
+        currentSlot = slot;
 
-            if (equippedGuns.TryGetValue(slot, out Gun newGun))
-            {
-                newGun.gameObject.SetActive(true);
-                ActiveGun = newGun.gameObject;
+        // Activate new gun
+        if (equippedGuns.TryGetValue(slot, out Gun newGun))
+        {
+            newGun.gameObject.SetActive(true);
+            ActiveGun = newGun.gameObject;
 
-                OnGunChanged?.Invoke(newGun);
-            }
+            CacheGunReferences(newGun);
+
+            OnGunChanged?.Invoke(newGun);
+        }
     }
 
     public EquipmentSlot GetNextWeaponSlot()
@@ -100,26 +123,51 @@ public class PlayerEquipmentManager : MonoBehaviour
         return slot != currentSlot && equippedGuns.ContainsKey(slot);
     }
 
-    private void Update()
-    {
-        if (ActiveGun != null)
-        {
-            if (gripRef != null)
-                Grip.SetPositionAndRotation(gripRef.position, gripRef.rotation);
-            
-            if (triggerRef != null)
-                Trigger.SetPositionAndRotation(triggerRef.position, triggerRef.rotation);
-        }
-    
-    }
-    
+    // ─────────────────────────────────────────────
+    //  Scripted Action Attach / Return
+    // ─────────────────────────────────────────────
 
-    private void CacheGunReferences()
+    /// <summary>
+    /// Reparents the active gun from WeaponHolder into the right hand socket.
+    /// While attached here the rigs no longer touch the gun — the animation
+    /// drives the hand, and the gun rides along because it is parented to it.
+    /// Used by reload now, and reusable for weapon switch / grenade later.
+    ///
+    /// Each weapon's mesh pivot differs, so the gun carries its own in-hand
+    /// pose offset (HoldPositionOffset / HoldRotationOffset on its GunData).
+    /// </summary>
+    public void AttachWeaponToHand()
     {
-        if (ActiveGun != null)
-        {
-            gripRef = ActiveGun.GetComponent<Gun>().References.Grip;
-            triggerRef = ActiveGun.GetComponent<Gun>().References.Trigger;
-        }
+        if (ActiveGun == null || handWeaponSocket == null) return;
+
+        ActiveGun.transform.SetParent(handWeaponSocket);
+
+        GunScriptableObject data = ActiveGun.GetComponent<Gun>().gunData;
+        ActiveGun.transform.localPosition = data.HoldPositionOffset;
+        ActiveGun.transform.localRotation = Quaternion.Euler(data.HoldRotationOffset);
+    }
+
+    /// <summary>
+    /// Reparents the active gun back under WeaponHolder so the aim/idle rigs
+    /// control it again. Because guns spawn at local zero inside WeaponHolder,
+    /// resetting to zero returns it exactly to its rig-controlled position.
+    /// </summary>
+    public void ReturnWeaponToHolder()
+    {
+        if (ActiveGun == null) return;
+
+        ActiveGun.transform.SetParent(weaponParent);
+        ActiveGun.transform.localPosition = Vector3.zero;
+        ActiveGun.transform.localRotation = Quaternion.identity;
+    }
+
+    // ─────────────────────────────────────────────
+    //  Gun Reference Caching
+    // ─────────────────────────────────────────────
+
+    private void CacheGunReferences(Gun gun)
+    {
+        gripRef    = gun.References.Grip;
+        triggerRef = gun.References.Trigger;
     }
 }

@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using FIMSpace.FTools;
+using System;
+using UnityEngine;
 
 namespace FIMSpace.FProceduralAnimation
 {
@@ -90,7 +92,22 @@ namespace FIMSpace.FProceduralAnimation
             Hips_ApplyTransformations();
         }
 
+        void InitHips()
+        {
+            _Hips_ElasticOffsetProcessor = new FMuscle_Vector3();
+            _Hips_ElasticOffsetProcessor.Initialize(Vector3.zero);
+            RefreshHipsSettings();
+        }
 
+        void RefreshHipsSettings()
+        {
+            if (_Hips_ElasticOffsetProcessor == null) return;
+
+            _Hips_ElasticOffsetProcessor.Acceleration = HipsSetup.HipsMuscle.Acceleration;
+            _Hips_ElasticOffsetProcessor.AccelerationLimit = HipsSetup.HipsMuscle.AccelerationLimit;
+            _Hips_ElasticOffsetProcessor.Damping = HipsSetup.HipsMuscle.Damping;
+            _Hips_ElasticOffsetProcessor.BrakePower = HipsSetup.HipsMuscle.BrakePower;
+        }
 
         protected virtual void Hips_ApplyTransformations()
         {
@@ -143,6 +160,14 @@ namespace FIMSpace.FProceduralAnimation
         public Vector3 _Hips_Modules_ExtraWOffset = Vector3.zero;
         public Vector3 _Hips_Modules_ExtraRotOffset = Vector3.zero;
 
+        [NonSerialized] FMuscle_Vector3 _Hips_ElasticOffsetProcessor = null;
+        public Vector3 _Hips_Modules_ExtraWOffsetElastic = Vector3.zero;
+
+        public Vector3 _Hips_Modules_ExtraWOffsetSmoothDamp = Vector3.zero;
+        Vector3 _AnimatedSmoothDampHipsOffset = Vector3.zero;
+        Vector3 _hipsOffset_sd = Vector3.zero;
+        public float _HipsOffsetSmoothDampDuration = 0.08f;
+
         void Hips_Calc_Apply()
         {
             _LastAppliedHipsFinalOffset = Vector3.zero;
@@ -151,6 +176,22 @@ namespace FIMSpace.FProceduralAnimation
 
             _LastAppliedHipsStabilityOffset = _Hips_FinalStabilityOffset * _MainBlendPlusGrounded * HipsAdjustingBlend;
             _LastAppliedHipsFinalPosition += _LastAppliedHipsStabilityOffset;
+
+            // Smooth damp offset
+            _AnimatedSmoothDampHipsOffset = Vector3.SmoothDamp(_AnimatedSmoothDampHipsOffset, _Hips_Modules_ExtraWOffsetSmoothDamp, ref _hipsOffset_sd, _HipsOffsetSmoothDampDuration, 1000000f, DeltaTime);
+            _Hips_Modules_ExtraWOffset += _AnimatedSmoothDampHipsOffset;
+            _Hips_Modules_ExtraWOffsetSmoothDamp = Vector3.zero;
+
+            // Elastic offset
+            if (_Hips_ElasticOffsetProcessor.ProceduralPosition == Vector3.zero && _Hips_Modules_ExtraWOffsetElastic == Vector3.zero) { }
+            else
+            {
+                Vector3 elOffset = _Hips_ElasticOffsetProcessor.Update(DeltaTime, _Hips_Modules_ExtraWOffsetElastic);
+                if (elOffset.y > 0f) { elOffset.y *= 1f - ImpulsesDampUpPushes; if (_Hips_ElasticOffsetProcessor.ProceduralPosition.y >= 0f) _Hips_ElasticOffsetProcessor.SelectiveUpdateY(DeltaTime * 1.5f, 0f); }
+                _Hips_Modules_ExtraWOffset += elOffset;
+                _Hips_Modules_ExtraWOffsetElastic = Vector3.zero;
+            }
+
             _LastAppliedHipsFinalPosition += _Hips_Modules_ExtraWOffset;
             _Hips_Modules_ExtraWOffset = Vector3.zero;
         }

@@ -345,18 +345,36 @@ namespace FIMSpace.FProceduralAnimation
                 if (Owner.RaycastStartHeight == ERaycastStartHeight.FirstBone)
                 {
                     origin = BoneStart.position;
-                    toGround = IKProcessor.fullLength;
+
+                    if (Owner.RaycastStartHeightMul != 1f)
+                    {
+                        Vector3 localOrigin = ToRootLocalSpace(origin);
+                        origin.y *= Owner.RaycastStartHeightMul;
+                        origin = RootSpaceToWorld(origin);
+                        toGround = IKProcessor.fullLength * Owner.RaycastStartHeightMul;
+                    }
+                    else
+                    {
+                        toGround = IKProcessor.fullLength;
+                    }
                 }
                 else
                 {
                     origin.x = castStartPointLocal.x;
-                    //origin.x = Ankle.LastKeyframeRootPos.x;
                     origin.z = castStartPointLocal.z;
 
                     toGround = Owner.ScaleReference * (Owner.RaycastStartHeightMul / Root.lossyScale.y);
 
                     if (Owner.RaycastStartHeight == ERaycastStartHeight.StaticScaleReference)
                         origin.y = toGround;
+                    else
+                    {
+                        if (Owner.RaycastStartHeightMul != 1f)
+                        {
+                            origin.y *= Owner.RaycastStartHeightMul;
+                            toGround *= Owner.RaycastStartHeightMul;
+                        }
+                    }
 
                     origin = RootSpaceToWorld(origin);
                 }

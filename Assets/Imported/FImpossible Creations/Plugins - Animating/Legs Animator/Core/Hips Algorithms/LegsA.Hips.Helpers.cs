@@ -15,29 +15,30 @@ namespace FIMSpace.FProceduralAnimation
             /*if (Calibrate) */ // Hips should be always precalibrated!
             HipsSetup.PreCalibrate();
 
-            #region Precalibrate spine if used
-
-            if( Calibrate != ECalibrateMode.None )
-            {
-                if( SpineBone != null ) // Precalibrate spine
-                {
-                    if( _spineBoneCalibrate.Transform == null ) _spineBoneCalibrate = new CalibrateTransform( SpineBone );
-                    _spineBoneCalibrate.Calibrate();
-
-                    if( ChestBone != null )
-                    {
-                        if( _ChestBoneCalibrate.Transform == null ) _ChestBoneCalibrate = new CalibrateTransform( ChestBone );
-                        _ChestBoneCalibrate.Calibrate();
-                    }
-                }
-            }
-
-            #endregion
-
+            ExtraPreCalibrate();
 
             Hips_Calc_PreRefreshVariables();
 
             HipsHubs_PreCalibrate();
+        }
+
+        /// <summary> Before hips pre-calibration </summary>
+        protected virtual void ExtraPreCalibrate()
+        {
+            if (Calibrate != ECalibrateMode.None)
+            {
+                if (SpineBone != null) // Precalibrate spine
+                {
+                    if (_spineBoneCalibrate.Transform == null) _spineBoneCalibrate = new CalibrateTransform(SpineBone);
+                    _spineBoneCalibrate.Calibrate();
+
+                    if (ChestBone != null)
+                    {
+                        if (_ChestBoneCalibrate.Transform == null) _ChestBoneCalibrate = new CalibrateTransform(ChestBone);
+                        _ChestBoneCalibrate.Calibrate();
+                    }
+                }
+            }
         }
 
         void Hips_Calc_Elasticity()
@@ -48,6 +49,7 @@ namespace FIMSpace.FProceduralAnimation
 
                 if( offsetPos.y > 0f )
                 {
+                    if (HipsSetup.HipsMuscle.ProceduralPosition.y >= 0f) HipsSetup.HipsMuscle.SelectiveUpdateY(DeltaTime * 1.5f, 0f);
                     offsetPos.y *= 1f - ImpulsesDampUpPushes;
                 }
 

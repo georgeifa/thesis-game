@@ -185,7 +185,7 @@ namespace FIMSpace.Generating
 
             public bool GetRandomFlip()
             {
-                return FGenerators.GetRandomFlip( random);
+                return FGenerators.GetRandomFlip(random);
             }
 
             #endregion
@@ -1185,7 +1185,11 @@ return 1f;
         [SerializeField] private Collider MainCollider;
         private Collider tempReplaceCollider;
 
+#if UNITY_6000_4_OR_NEWER
+        EntityId eid;
+#else
         private int id;
+#endif
         public int subID;
         private Texture tex;
 
@@ -1203,6 +1207,15 @@ return 1f;
                     return null;
                 }
 
+#if UNITY_6000_4_OR_NEWER
+                if (tex == null || eid != Prefab.GetEntityId())
+                {
+                    eid = Prefab.GetEntityId();
+#if UNITY_EDITOR
+                    tex = AssetPreview.GetAssetPreview(Prefab);
+#endif
+                }
+#else
                 if (tex == null || id != Prefab.GetInstanceID())
                 {
                     id = Prefab.GetInstanceID();
@@ -1210,6 +1223,7 @@ return 1f;
                     tex = AssetPreview.GetAssetPreview(Prefab);
 #endif
                 }
+#endif
 
                 return tex;
             }
@@ -1333,7 +1347,7 @@ return 1f;
                             if (prefabRef.Prefab.transform.rotation != Quaternion.identity)
                             {
                                 EditorGUILayout.BeginVertical();
-                                EditorGUILayout.HelpBox("Prefab rotation is not 0,0,0!", UnityEditor.MessageType.None);
+                                EditorGUILayout.HelpBox("Prefab rotation is not 0,0,0!", MessageType.None);
                                 if (GUILayout.Button(new GUIContent("FIX", "Setting prefab rotation to 0,0,0 but you can use rotation offset for advanced adjustments for spawning\nbut it's recommended to set 0,0,0 to avoid some unwanted not clear rotations"))) { prefabRef.Prefab.transform.rotation = Quaternion.identity; AssetDatabase.SaveAssets(); }
                                 EditorGUILayout.EndVertical();
                             }

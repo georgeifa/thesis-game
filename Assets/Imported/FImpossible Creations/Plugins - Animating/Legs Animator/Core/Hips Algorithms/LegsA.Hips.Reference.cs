@@ -17,7 +17,7 @@ namespace FIMSpace.FProceduralAnimation
             [Tooltip("Applying elasticity algorithm on the pelvis bone align motion, to make it look more organic.")]
             [FPD_Suffix(0f, 1f)] public float HipsElasticityBlend = 1f;
             //[Range(0f, 1f)] public float HipsMotionInfluence = 1f;
-            public FMuscle_Vector3 HipsMuscle;
+            public FMuscle_Vector3 HipsMuscle = new FMuscle_Vector3();
 
             [FPD_Suffix(0f, 1f)] public float HipsRotElasticityBlend = 0f;
             public FMuscle_Quaternion HipsRotMuscle;
@@ -212,6 +212,7 @@ namespace FIMSpace.FProceduralAnimation
             {
                 Calibrate();
                 _Hips_LastHipsOffset = 0f;
+                _Hips_StepHeightAdjustOffset = 0f;
             }
 
             public void PreCalibrate()

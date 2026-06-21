@@ -8,28 +8,36 @@ namespace FIMSpace.FProceduralAnimation
     [CreateAssetMenu(fileName = "Module Settings-Impulses On Stop And On Land", menuName = "FImpossible Creations/Legs Animator/Module - Impulses on Stop and Land Setup", order = 4)]
     public class LAM_ImpulsesOnStopAndOnLand : LegsAnimatorControlModuleBase
     {
+        public float MinimumImpulseCulldown = 0.1f;
+
         [FPD_Header("Triggering hips push impulses")]
         public LegsAnimator.PelvisImpulseSettings OnStopImpulse;
         public LegsAnimator.PelvisImpulseSettings OnLandImpulse;
         [FPD_Header("Set Zero Power to Not Use")]
         public LegsAnimator.PelvisImpulseSettings OnStartMoveImpulse;
 
+        [Tooltip("Animator float parameter to control impulses power")]
+        public string PowerMultiplierParameter = "";
+
+        protected int _hash_powerMul = -1;
+
         readonly string powerMulStrN = "Power Multiplier";
         readonly string durMulStrN = "Duration Multiplier";
         readonly string spdLandPower = "Speed Affects Land";
 
-        bool lastGrounded = true;
-        bool lastMoving = false;
+        protected bool lastGrounded = true;
+        protected bool lastMoving = false;
 
-        float lastMovingTime = 0f;
-        float lastUngroundedTime = 0f;
+        protected float lastMovingTime = 0f;
+        protected float lastUngroundedTime = 0f;
+        protected float externalPowerMul = 1f;
 
-        LegsAnimator.Variable _powerMulVar;
-        LegsAnimator.Variable _durMulVar;
-        LegsAnimator.Variable _spdAffectsLand;
+        protected LegsAnimator.Variable _powerMulVar;
+        protected LegsAnimator.Variable _durMulVar;
+        protected LegsAnimator.Variable _spdAffectsLand;
 
         protected float customMul = 1f;
-
+        protected float impulseCulldownElapsed = 0f;
 
         private void Reset()
         {
@@ -46,11 +54,17 @@ namespace FIMSpace.FProceduralAnimation
             _powerMulVar = helper.RequestVariable(powerMulStrN, 1f);
             _durMulVar = helper.RequestVariable(durMulStrN, 1f);
             _spdAffectsLand = helper.RequestVariable(spdLandPower, false);
+
+            if (!string.IsNullOrWhiteSpace(PowerMultiplierParameter)) _hash_powerMul = Animator.StringToHash(PowerMultiplierParameter);
         }
 
         public override void OnUpdate(LegsAnimator.LegsAnimatorCustomModuleHelper helper)
         {
             var l = LA;
+
+            impulseCulldownElapsed += l.DeltaTime;
+
+            if (_hash_powerMul != -1) externalPowerMul = LA.Mecanim.GetFloat(_hash_powerMul);
 
             if (l.IsInAir)
             {
@@ -77,7 +91,7 @@ namespace FIMSpace.FProceduralAnimation
                 if (OnStopImpulse.PowerMultiplier != 0f)
                     if (l.IsMoving == false)
                     {
-                        if (lastMovingTime > 0.3f)
+                        if (lastMovingTime > 0.4f)
                             if (l.GroundedTime > 0.25f)
                                 Impact_OnEndsMove(l);
                     }
@@ -95,20 +109,27 @@ namespace FIMSpace.FProceduralAnimation
 
         protected virtual void Impact_OnStartMove(LegsAnimator l)
         {
-            l.User_AddImpulse(OnStartMoveImpulse, _powerMulVar.GetFloat() * customMul, _durMulVar.GetFloat());
+            if( impulseCulldownElapsed < MinimumImpulseCulldown ) return;
+            impulseCulldownElapsed = 0f;
+            l.User_AddImpulse( OnStartMoveImpulse, _powerMulVar.GetFloat() * customMul * externalPowerMul, _durMulVar.GetFloat());
         }
 
         protected virtual void Impact_OnEndsMove(LegsAnimator l)
         {
-            l.User_AddImpulse(OnStopImpulse, _powerMulVar.GetFloat() * customMul, _durMulVar.GetFloat());
+            if (impulseCulldownElapsed < MinimumImpulseCulldown) return;
+            impulseCulldownElapsed = 0f;
+            l.User_AddImpulse(OnStopImpulse, _powerMulVar.GetFloat() * customMul * externalPowerMul, _durMulVar.GetFloat());
         }
 
         protected virtual void Impact_OnLanding(LegsAnimator l)
         {
+            if (impulseCulldownElapsed < MinimumImpulseCulldown) return;
+            impulseCulldownElapsed = 0f;
+
             if (_spdAffectsLand.GetBool())
-                l.User_AddImpulse(OnLandImpulse, _powerMulVar.GetFloat() * (customMul), _durMulVar.GetFloat());
+                l.User_AddImpulse(OnLandImpulse, _powerMulVar.GetFloat() * (customMul * externalPowerMul), _durMulVar.GetFloat());
             else
-                l.User_AddImpulse(OnLandImpulse, _powerMulVar.GetFloat() * (customMul <= 0f ? 1f : customMul), _durMulVar.GetFloat());
+                l.User_AddImpulse(OnLandImpulse, _powerMulVar.GetFloat() * (customMul <= 0f ? 1f : customMul) * externalPowerMul, _durMulVar.GetFloat());
         }
 
         #region Editor Code

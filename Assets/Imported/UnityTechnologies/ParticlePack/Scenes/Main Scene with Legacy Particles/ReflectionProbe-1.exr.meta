@@ -130,6 +130,6 @@ AssetOrigin:
   productId: 127325
   packageName: Particle Pack
   packageVersion: 3.1
-  assetPath: Assets/UnityTechnologies/ParticlePack/Scenes/Main Scene with Legacy
-    Particles/ReflectionProbe-1.exr
-  uploadId: 691001
+  assetPath: Assets/Imported/UnityTechnologies/ParticlePack/Scenes/Main Scene with
+    Legacy Particles/ReflectionProbe-1.exr
+  uploadId: 896138

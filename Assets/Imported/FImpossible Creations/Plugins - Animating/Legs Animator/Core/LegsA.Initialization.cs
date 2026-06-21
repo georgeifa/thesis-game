@@ -38,6 +38,7 @@ namespace FIMSpace.FProceduralAnimation
             Initialize_BaseTransform();
             RefreshMatrices();
             _wasInstantTriggered = true;
+            InitHips();
 
             Legs_RefreshLegsOwner();
             User_RefreshHelperVariablesOnParametersChange();

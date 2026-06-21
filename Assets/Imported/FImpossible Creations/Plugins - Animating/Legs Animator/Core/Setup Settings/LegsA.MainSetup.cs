@@ -100,7 +100,7 @@ namespace FIMSpace.FProceduralAnimation
 
 
         /// <summary> World up reference for the algorithm </summary>
-        public Vector3 Up { get { return _worldUpAxisVector; } set { _worldUpAxisVector = value; } }
+        public Vector3 Up { get { return _worldUpAxisVector; } set { _worldUpAxisVector = value.normalized; } }
         private Vector3 _worldUpAxisVector = Vector3.up;
 
         /// <summary>Time how long character stands on the ground, when value is below zero that's the time being ungrounded </summary>
@@ -162,7 +162,7 @@ namespace FIMSpace.FProceduralAnimation
         }
 
 
-        protected void Legs_PreCalibrate()
+        protected virtual void Legs_PreCalibrate()
         {
             var leg = Legs[0];
             while (leg != null)

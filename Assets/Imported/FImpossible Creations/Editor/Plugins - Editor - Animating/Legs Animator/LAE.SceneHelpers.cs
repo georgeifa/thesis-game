@@ -17,7 +17,7 @@ namespace FIMSpace.FProceduralAnimation
 
         public Transform SceneHelper_FocusOnBone = null;
 
-        void SceneHelper_DrawBoneFocus()
+        protected void SceneHelper_DrawBoneFocus()
         {
             if (SceneHelper_FocusOnBone == null) return;
 
@@ -69,7 +69,7 @@ namespace FIMSpace.FProceduralAnimation
 
         }
 
-        void SceneHelper_DrawHipsHubs()
+        protected void SceneHelper_DrawHipsHubs()
         {
             if (Get.Hips == null) return;
             if (Get.ExtraHipsHubs == null) return;
@@ -102,7 +102,7 @@ namespace FIMSpace.FProceduralAnimation
         }
 
 
-        void SceneHelper_DrawLegStartBoneSelector(LegsAnimator.Leg leg, float drawScale, Transform legsHub)
+        protected void SceneHelper_DrawLegStartBoneSelector(LegsAnimator.Leg leg, float drawScale, Transform legsHub)
         {
             if (legsHub == null) return;
 
@@ -144,7 +144,7 @@ namespace FIMSpace.FProceduralAnimation
         }
 
 
-        void SceneHelper_DrawLegSelectorHelper()
+        protected void SceneHelper_DrawLegSelectorHelper()
         {
             if (Get.LegsInitialized) return;
             if (_selected_leg < 0) return;
@@ -322,7 +322,7 @@ namespace FIMSpace.FProceduralAnimation
             Handles.DrawAAPolyLine(lineWidth, leg.BoneMid.position, leg.BoneEnd.position);
         }
 
-        void SceneHelper_DrawScaleReference()
+        internal void SceneHelper_DrawScaleReference()
         {
             float rScale = editorScaleRef;
             Handles.color = new Color(0.3f, 0.9f, 0.35f, 0.55f);
@@ -359,6 +359,10 @@ namespace FIMSpace.FProceduralAnimation
             }
             else
             {
+                sidePos = Get.BaseTransform.InverseTransformPoint(sidePos);
+                sidePos.y *= Get.RaycastStartHeightMul;
+                sidePos = Get.BaseTransform.TransformPoint(sidePos);
+
                 grnd = Get.Hips.position;
                 grnd = Get.BaseTransform.InverseTransformPoint(grnd);
                 grnd.y = 0f;
@@ -435,7 +439,7 @@ namespace FIMSpace.FProceduralAnimation
         }
 
 
-        void SceneHelper_DrawGlueFloorLevel()
+        protected void SceneHelper_DrawGlueFloorLevel()
         {
             Handles.matrix = Get.BaseTransform.localToWorldMatrix;
             float f = Get.ScaleReferenceNoScale;
@@ -449,7 +453,7 @@ namespace FIMSpace.FProceduralAnimation
         }
 
 
-        void SceneHelper_DrawRaycastingStepDown()
+        protected void SceneHelper_DrawRaycastingStepDown()
         {
             if (Get.RaycastStyle == LegsAnimator.ERaycastStyle.NoRaycasting) return;
 
@@ -532,7 +536,7 @@ namespace FIMSpace.FProceduralAnimation
             Handles.matrix = Matrix4x4.identity;
         }
 
-        void SceneHelper_DrawRaycastingPreview(Color baseColor)
+        protected void SceneHelper_DrawRaycastingPreview(Color baseColor)
         {
             if (Application.isPlaying == false) return;
 
@@ -637,13 +641,13 @@ namespace FIMSpace.FProceduralAnimation
         }
 
 
-        void SceneHelper_DrawDefinedBones(Color? customColor = null)
+        protected void SceneHelper_DrawDefinedBones(Color? customColor = null, float alpha = 1f)
         {
             if (_selected_leg >= 0) return;
             if (Get.Hips == null) return;
 
-            Handles.color = new Color(0.25f, 0.9f, 0.7f, 0.8f);
-            if (customColor != null) Handles.color = customColor.Value;
+            Handles.color = new Color(0.25f, 0.9f, 0.7f, 0.8f * alpha);
+            if( customColor != null ) { Color cCol = customColor.Value; cCol.a *= alpha; Handles.color = cCol; }
 
             for (int i = 0; i < Get.Legs.Count; i++)
             {
@@ -658,7 +662,7 @@ namespace FIMSpace.FProceduralAnimation
         }
 
 
-        void SceneHelper_DrawDefinedBonesHipsLink(Color? customColor = null)
+        protected void SceneHelper_DrawDefinedBonesHipsLink(Color? customColor = null)
         {
             if (_selected_leg >= 0) return;
             if (Get.Hips == null) return;
@@ -850,7 +854,7 @@ namespace FIMSpace.FProceduralAnimation
             return false;
         }
 
-        Color Util_IndexColor(int index, float s = 0.3f, float v = 0.45f, float hueOff = 0f, float hueMul = 1f)
+        internal Color Util_IndexColor(int index, float s = 0.3f, float v = 0.45f, float hueOff = 0f, float hueMul = 1f)
         {
             float h = ((float)index * 0.1f * hueMul + 0.2f + hueOff) % 1;
             return Color.HSVToRGB(h, s, v);

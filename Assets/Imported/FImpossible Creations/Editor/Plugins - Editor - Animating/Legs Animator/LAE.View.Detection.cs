@@ -37,15 +37,23 @@ namespace FIMSpace.FProceduralAnimation
 
             sp_cast.Next(false);
             if (raycastDropDraw)
+            {
+                GUILayout.Space(3);
+                EditorGUI.indentLevel++;
+                EditorGUIUtility.labelWidth = 172;
+                EditorGUIUtility.fieldWidth = 38;
+
                 if (Get.RaycastStartHeight == LegsAnimator.ERaycastStartHeight.StaticScaleReference)
                 {
-                    GUILayout.Space(3);
-                    EditorGUI.indentLevel++;
-                    EditorGUIUtility.labelWidth = 172;
-                    EditorGUIUtility.fieldWidth = 38;
-                    EditorGUILayout.PropertyField(sp_cast); // Raycast Start Height mul
-                    EditorGUI.indentLevel--;
+                    EditorGUILayout.Slider(sp_cast, 0.5f, 2f); // Raycast Start Height mul
                 }
+                else
+                {
+                    EditorGUILayout.Slider(sp_cast, 0.25f, 1f);// Raycast Start Height mul
+                }
+
+                EditorGUI.indentLevel--;
+            }
 
             EditorGUIUtility.labelWidth = 140;
             EditorGUIUtility.fieldWidth = 25;
@@ -122,22 +130,26 @@ namespace FIMSpace.FProceduralAnimation
         }
 
 
-        protected void View_Setup_IKSetup()
+        protected void View_Setup_IKSetup(bool upperSettings = true)
         {
             EditorGUILayout.BeginVertical(FGUI_Resources.BGInBoxBlankStyle);
 
             SerializedProperty sp_ik = sp_IKHint.Copy();
 
-            EditorGUILayout.PropertyField(sp_ik); // Hint mode
-            sp_ik.Next(false);
-            EditorGUILayout.PropertyField(sp_ik); // Max Stretch
+            if (upperSettings)
+            {
+                EditorGUILayout.PropertyField(sp_ik); // Hint mode
+                sp_ik.Next(false);
+                EditorGUILayout.PropertyField(sp_ik); // Max Stretch
 
-            GUILayout.Space(5);
-            sp_ik.Next(false); EditorGUILayout.PropertyField(sp_ik); // Foot Y Offset
-            //sp_ik.Next(false); if (!Get.AnimateFeet) GUI.color = Color.white * 0.75f; EditorGUILayout.PropertyField(sp_ik); // Foots Length
-            GUI.color = Color.white;
+                GUILayout.Space(5);
+                sp_ik.Next(false); EditorGUILayout.PropertyField(sp_ik); // Foot Y Offset
+                //sp_ik.Next(false); if (!Get.AnimateFeet) GUI.color = Color.white * 0.75f; EditorGUILayout.PropertyField(sp_ik); // Foots Length
+                GUI.color = Color.white;
 
-            FGUI_Inspector.DrawUILineCommon(9);
+                FGUI_Inspector.DrawUILineCommon(9);
+            }
+
             View_Setup_IKLegstListHeader();
 
             if (Get.Legs.ContainsIndex(_setupik_selected_leg) == false) _setupik_selected_leg = -1;
@@ -254,15 +266,18 @@ namespace FIMSpace.FProceduralAnimation
 
 
 
-        void View_Setup_OptimSetup()
+        protected void View_Setup_OptimSetup(bool drawHeader = true)
         {
-            EditorGUILayout.BeginVertical(FGUI_Resources.BGInBoxBlankStyle);
+            if (drawHeader)
+            {
+                EditorGUILayout.BeginVertical(FGUI_Resources.BGInBoxBlankStyle);
 
-            GUILayout.Space(-5);
-            EditorGUILayout.LabelField("Optimization Settings", FGUI_Resources.HeaderStyle);
-            FGUI_Inspector.DrawUILineCommon();
+                GUILayout.Space(-5);
+                EditorGUILayout.LabelField("Optimization Settings", FGUI_Resources.HeaderStyle);
+                FGUI_Inspector.DrawUILineCommon();
 
-            GUILayout.Space(4);
+                GUILayout.Space(4);
+            }
 
             EditorGUILayout.PropertyField(sp_DisableIfInvisible);
             if ( Get.DisableIfInvisible != null) EditorGUILayout.PropertyField(sp_DisableIfInvisibleArray);
@@ -310,7 +325,7 @@ namespace FIMSpace.FProceduralAnimation
 
             GUI.enabled = true;
 
-            EditorGUILayout.EndVertical();
+            if (drawHeader) EditorGUILayout.EndVertical();
         }
 
 

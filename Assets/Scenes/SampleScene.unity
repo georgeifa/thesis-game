@@ -119,6 +119,37 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &2598355
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2598356}
+  m_Layer: 7
+  m_Name: mag
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2598356
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2598355}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 58965101}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &58965100
 GameObject:
   m_ObjectHideFlags: 0
@@ -150,6 +181,7 @@ Transform:
   m_Children:
   - {fileID: 1904689161}
   - {fileID: 1040876445}
+  - {fileID: 2598356}
   m_Father: {fileID: 1905888955}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &136114452
@@ -769,6 +801,37 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
+--- !u!1 &351108978
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 351108979}
+  m_Layer: 7
+  m_Name: HandWeaponSocket
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &351108979
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 351108978}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3642309190013199328}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -2696,6 +2759,37 @@ Transform:
   - {fileID: 1843514412}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1634784564
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1634784565}
+  m_Layer: 7
+  m_Name: HandMagazineSocket
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1634784565
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1634784564}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.47431993, y: -0.42719832, z: -0.4963473, w: 0.588355}
+  m_LocalPosition: {x: 0.003, y: 0.102, z: 0.117}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8144158445552650731}
+  m_LocalEulerAnglesHint: {x: 7.704, y: -79.238, z: -86.684}
 --- !u!1 &1675062315
 GameObject:
   m_ObjectHideFlags: 0
@@ -3119,6 +3213,7 @@ GameObject:
   - component: {fileID: 1843514417}
   - component: {fileID: 1843514418}
   - component: {fileID: 1843514420}
+  - component: {fileID: 1843514422}
   m_Layer: 7
   m_Name: Player
   m_TagString: Damagable
@@ -3447,6 +3542,9 @@ MonoBehaviour:
   StabilizeOnIsMoving: 0.5
   _Hips_Modules_ExtraWOffset: {x: 0, y: 0, z: 0}
   _Hips_Modules_ExtraRotOffset: {x: 0, y: 0, z: 0}
+  _Hips_Modules_ExtraWOffsetElastic: {x: 0, y: 0, z: 0}
+  _Hips_Modules_ExtraWOffsetSmoothDamp: {x: 0, y: 0, z: 0}
+  _HipsOffsetSmoothDampDuration: 0.08
   Legs:
   - G_CustomForceAttach: 0
     G_CustomForceNOTDetach: 0
@@ -3818,9 +3916,9 @@ MonoBehaviour:
   Primary: {fileID: 11400000, guid: e10ffcf5cee60bb479a6e77fde82e617, type: 2}
   Secondary: {fileID: 11400000, guid: e10ffcf5cee60bb479a6e77fde82e617, type: 2}
   weaponParent: {fileID: 1905888955}
-  ActiveGun: {fileID: 0}
   Grip: {fileID: 1040876445}
   Trigger: {fileID: 1904689161}
+  handWeaponSocket: {fileID: 351108979}
 --- !u!114 &1843514419
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3866,6 +3964,26 @@ MonoBehaviour:
   fireActionName: Attack
   reloadActionName: Reload
   weaponSwapActionName: Scroll Weapon
+--- !u!114 &1843514422
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1843514407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3a6c1fce9336d743b9ac4c6bfd963c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  actionsLayerName: Actions
+  leftHandIK: {fileID: 855682847}
+  rightHandIK: {fileID: 1722831000}
+  magHandSocket: {fileID: 1634784565}
+  droppedMagPrefab: {fileID: 1142805415186994014, guid: 3fa81c880cfff2042a7bb6824afe1fba, type: 3}
+  droppedMagLifetime: 3
+  ikBlendSpeed: 100
+  layerBlendSpeed: 6
 --- !u!1 &1904689160
 GameObject:
   m_ObjectHideFlags: 0
@@ -4904,6 +5022,7 @@ Transform:
   - {fileID: 4304235328622941248}
   - {fileID: 6176069643232639780}
   - {fileID: 6774444182507702486}
+  - {fileID: 351108979}
   m_Father: {fileID: 624565254150105472}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3666184165258174023
@@ -6009,6 +6128,7 @@ Transform:
   - {fileID: 7699547940794653101}
   - {fileID: 8126443464729037943}
   - {fileID: 7869908716160962686}
+  - {fileID: 1634784565}
   m_Father: {fileID: 5615698781584057041}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &8166659537865244730

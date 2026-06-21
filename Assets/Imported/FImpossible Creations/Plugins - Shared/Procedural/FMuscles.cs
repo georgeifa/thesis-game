@@ -170,6 +170,11 @@ namespace FIMSpace.FTools
             ProceduralPosition = new Vector3(x.OutValue, y.OutValue, z.OutValue);
         }
 
+        public void SelectiveUpdateY(float delta, float desired)
+        {
+            y.Update(delta, ProceduralPosition.y, desired, Acceleration, AccelerationLimit, Damping, BrakePower);
+            ProceduralPosition = new Vector3(ProceduralPosition.x, y.OutValue, ProceduralPosition.z);
+        }
 
         [FPD_Suffix(0f, 10000)] public float Acceleration = 10000f;
         [FPD_Suffix(0f, 10000)] public float AccelerationLimit = 5000f;
@@ -221,6 +226,14 @@ namespace FIMSpace.FTools
             x.OverrideValue(newPos.x);
             y.OverrideValue(newPos.y);
             z.OverrideValue(newPos.z);
+        }
+
+        public void PasteSettingsOf(FMuscle_Vector3 other)
+        {
+            Acceleration = other.Acceleration;
+            AccelerationLimit = other.AccelerationLimit;
+            Damping = other.Damping;
+            BrakePower = other.BrakePower;
         }
     }
 
@@ -360,6 +373,14 @@ namespace FIMSpace.FTools
             y.OverrideValue(rotation.y);
             z.OverrideValue(rotation.z);
             w.OverrideValue(rotation.w);
+        }
+
+        public void PasteSettingsOf(FMuscle_Quaternion other)
+        {
+            Acceleration = other.Acceleration;
+            AccelerationLimit = other.AccelerationLimit;
+            BrakePower = other.BrakePower;
+            Damping = other.Damping;
         }
     }
 

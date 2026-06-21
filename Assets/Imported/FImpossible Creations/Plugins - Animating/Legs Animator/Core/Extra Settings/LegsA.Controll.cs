@@ -132,6 +132,7 @@ namespace FIMSpace.FProceduralAnimation
             if( string.IsNullOrWhiteSpace( RagdolledParameter ) == false ) _hash_Ragdolled = Animator.StringToHash( RagdolledParameter ); else _hash_Ragdolled = -1;
         }
 
+        [NonSerialized] public float GluingDelay = 0f;
         public bool Helper_WasMoving { get; private set; }
         protected virtual void Controll_Update()
         {
@@ -191,7 +192,7 @@ namespace FIMSpace.FProceduralAnimation
                 if (GroundedTime < 0.1f /*|| IsMovingBlend > 0.5f*/) _glueModeExecuted = EGlueMode.Moving;
                 else
                 {
-                    if (IsMoving) _glueModeExecuted = EGlueMode.Moving;
+                    if (IsMoving && MovingTime >= GluingDelay) _glueModeExecuted = EGlueMode.Moving;
                     else _glueModeExecuted = EGlueMode.Idle;
                 }
             }

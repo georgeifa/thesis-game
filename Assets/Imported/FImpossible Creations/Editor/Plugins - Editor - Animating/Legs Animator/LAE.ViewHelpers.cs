@@ -20,7 +20,7 @@ namespace FIMSpace.FProceduralAnimation
         GUIContent __guic_autoFind = null;
 
 
-        void GUI_Prepare()
+        protected void GUI_Prepare()
         {
             if (Get.Legs == null) Get.Legs = new System.Collections.Generic.List<LegsAnimator.Leg>();
 

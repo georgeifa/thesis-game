@@ -100,5 +100,6 @@ AssetOrigin:
   productId: 127325
   packageName: Particle Pack
   packageVersion: 3.1
-  assetPath: Assets/UnityTechnologies/ParticlePack/EffectExamples/Magic Effects/Models/IceShard.FBX
-  uploadId: 691001
+  assetPath: Assets/Imported/UnityTechnologies/ParticlePack/EffectExamples/Magic
+    Effects/Models/IceShard.FBX
+  uploadId: 896138

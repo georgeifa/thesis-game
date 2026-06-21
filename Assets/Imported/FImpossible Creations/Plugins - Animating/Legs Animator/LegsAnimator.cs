@@ -64,7 +64,7 @@ namespace FIMSpace.FProceduralAnimation
             Initialize();
         }
 
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
 
             #region Recompile support (Thanks to zORg_alex on our Discord!)
@@ -400,6 +400,9 @@ namespace FIMSpace.FProceduralAnimation
             {
                 UseEvents = false;
             }
+
+            // Keep settings up to date
+            RefreshHipsSettings();
         }
 
         /// <summary> Use if you're adding legs animator runtime </summary>

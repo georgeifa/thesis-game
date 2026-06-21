@@ -10,7 +10,37 @@ namespace FIMSpace.FProceduralAnimation
 
         static GUIContent __cont = null;
         static GUIContent _cont { get { if (__cont == null) __cont = new GUIContent(); return __cont; } }
+        protected virtual bool DrawBaseTransform { get { return true; } }
 
+
+        protected virtual void View_Setup_DrawSetupMainSettings()
+        {
+            EditorGUIUtility.labelWidth = 140;
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.PropertyField(sp_DelayedInitialization);
+            var sp = sp_DelayedInitialization.Copy();
+            GUILayout.FlexibleSpace();
+            EditorGUIUtility.labelWidth = 74;
+            sp.Next(false); EditorGUILayout.PropertyField(sp);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUIUtility.labelWidth = 140;
+            EditorGUILayout.BeginHorizontal();
+
+            if (Get.Mecanim)
+            {
+                Get.AnimatePhysics = Get.Mecanim.updateMode == AnimatorUpdateMode.Fixed;
+            }
+
+            sp.Next(false);
+            if (!Get.Mecanim) EditorGUILayout.PropertyField(sp); // Animate physics only if no Mecanim
+            sp.Next(false);
+            EditorGUILayout.PropertyField(sp); // Unscaled Delta
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUIUtility.labelWidth = 0;
+        }
 
         void View_Setup()
         {
@@ -18,7 +48,7 @@ namespace FIMSpace.FProceduralAnimation
             EditorGUILayout.BeginVertical(FGUI_Resources.BGInBoxBlankStyle);
 
             EditorGUIUtility.labelWidth = 108;
-            View_Setup_BaseTransform();
+            if (DrawBaseTransform) View_Setup_BaseTransform();
             View_Setup_Hips();
             //View_Setup_Spine();
 
@@ -103,31 +133,8 @@ namespace FIMSpace.FProceduralAnimation
                         GUILayout.Space(2);
                         FGUI_Inspector.DrawUILineCommon();
 
-                        EditorGUIUtility.labelWidth = 140;
+                        View_Setup_DrawSetupMainSettings();
 
-                        EditorGUILayout.BeginHorizontal();
-                        EditorGUILayout.PropertyField(sp_DelayedInitialization);
-                        var sp = sp_DelayedInitialization.Copy();
-                        GUILayout.FlexibleSpace();
-                        EditorGUIUtility.labelWidth = 74;
-                        sp.Next(false); EditorGUILayout.PropertyField(sp);
-                        EditorGUILayout.EndHorizontal();
-
-                        EditorGUIUtility.labelWidth = 140;
-                        EditorGUILayout.BeginHorizontal();
-
-                        if (Get.Mecanim)
-                        {
-                            Get.AnimatePhysics = Get.Mecanim.updateMode == AnimatorUpdateMode.Fixed;
-                        }
-
-                        sp.Next(false);
-                        if (!Get.Mecanim) EditorGUILayout.PropertyField(sp); // Animate physics only if no Mecanim
-                        sp.Next(false);
-                        EditorGUILayout.PropertyField(sp); // Unscaled Delta
-                        EditorGUILayout.EndHorizontal();
-
-                        EditorGUIUtility.labelWidth = 0;
                         EditorGUILayout.EndVertical();
                         GUILayout.Space(-5);
                     }
@@ -787,7 +794,7 @@ namespace FIMSpace.FProceduralAnimation
         }
 
 
-        protected void View_Setup_DrawLegs()
+        protected void View_Setup_DrawLegs(bool extraSettingsShow = true)
         {
             if (_toRemove_leg != -1)
             {
@@ -803,7 +810,7 @@ namespace FIMSpace.FProceduralAnimation
                 View_Setup_Leg_SingleLine(leg, i);
             }
 
-
+            if (extraSettingsShow == false) return;
 
             if (_selected_leg < 0)
             {

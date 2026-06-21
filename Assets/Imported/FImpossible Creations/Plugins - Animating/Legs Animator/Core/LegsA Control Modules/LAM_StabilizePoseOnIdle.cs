@@ -11,6 +11,11 @@ namespace FIMSpace.FProceduralAnimation
         Vector3 currentHeightAdjust = Vector3.zero;
         Vector3 sd_currentHeightAdjust = Vector3.zero;
 
+        public bool overrideBlend = false;
+        public float overrideBlendValue = 0.5f;
+        public bool overrideSpeed = false;
+        public float overrideSpeedValue = 0.75f;
+
         LegsAnimator.Variable _blendV;
         LegsAnimator.Variable _adjSpeed;
 
@@ -18,6 +23,8 @@ namespace FIMSpace.FProceduralAnimation
         {
             _blendV = helper.RequestVariable("Blend", 1f);
             _adjSpeed = helper.RequestVariable("Adjusting Speed", 1f);
+            if( overrideBlend ) _blendV.SetValue( overrideBlendValue );
+            if( overrideSpeed ) _adjSpeed.SetValue( overrideSpeedValue );
         }
 
         public override void OnReInitialize(LegsAnimator.LegsAnimatorCustomModuleHelper helper)

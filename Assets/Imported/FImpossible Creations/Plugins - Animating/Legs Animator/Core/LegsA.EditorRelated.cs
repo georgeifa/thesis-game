@@ -83,6 +83,8 @@ namespace FIMSpace.FProceduralAnimation
         bool _editor_disabledGizmo = false;
         private void OnValidate()
         {
+            if (gameObject.activeInHierarchy == false) return;
+
             if (Application.isPlaying == false)
             {
                 User_RefreshHelperVariablesOnParametersChange();
@@ -91,11 +93,11 @@ namespace FIMSpace.FProceduralAnimation
             {
                 if (LegsInitialized == false) return;
                 User_UpdateParametersAfterManualChange();
-                Controll_DefineHashes();
             }
 
+            Controll_DefineHashes();
             _Editor_OnValidateTrigger = true;
-            if( !_editor_disabledGizmo ) { FSceneIcons.SetGizmoIconEnabled(this, false); _editor_disabledGizmo = true; }
+            if (!_editor_disabledGizmo) { FSceneIcons.SetGizmoIconEnabled(this, false); _editor_disabledGizmo = true; }
         }
 
 

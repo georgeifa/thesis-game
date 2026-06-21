@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace FIMSpace.FProceduralAnimation
@@ -28,8 +29,9 @@ namespace FIMSpace.FProceduralAnimation
 
             public static AnimationCurve DefaultCurve11 { get { if (_defaultCurve11 == null) _defaultCurve11 = AnimationCurve.Linear(0f, 1f, 1f, 1f); return _defaultCurve11; } }
             private static AnimationCurve _defaultCurve11 = null;
+            public Func<ImpulseExecutor, float> ImpulseMultiplyAction;
 
-            public ImpulseExecutor(PelvisImpulseSettings settings, float powerMultiplier = 1f, float durationMultiplier = 1f)
+            public ImpulseExecutor(PelvisImpulseSettings settings, float powerMultiplier = 1f, float durationMultiplier = 1f, Func<ImpulseExecutor, float> powerMultiplyAction = null)
             {
                 Elapsed = 0f;
                 PowerMultiplier = settings.PowerMultiplier * powerMultiplier;
@@ -41,9 +43,10 @@ namespace FIMSpace.FProceduralAnimation
                 ImpulseCurve = settings.ImpulseCurve;
                 YAxisMultiplyCurve = settings.YAxisMultiplyCurve;
                 AlignDesired = settings.AlignWithDesiredMoveDirection;
+                ImpulseMultiplyAction = powerMultiplyAction;
             }
 
-            public ImpulseExecutor(Vector3 localOffset, float duration, float elastic = 1f, AnimationCurve curve = null, bool alignWithDesiredDir = false)
+            public ImpulseExecutor(Vector3 localOffset, float duration, float elastic = 1f, AnimationCurve curve = null, bool alignWithDesiredDir = false, Func<ImpulseExecutor, float> powerMultiplyAction = null)
             {
                 Elapsed = 0f;
                 PowerMultiplier = 1f;
@@ -56,9 +59,10 @@ namespace FIMSpace.FProceduralAnimation
                 YAxisMultiplyCurve = DefaultCurve11;
                 HipsRotation = Vector3.zero;
                 AlignDesired = alignWithDesiredDir;
+                ImpulseMultiplyAction = powerMultiplyAction;
             }
 
-            public ImpulseExecutor(Vector3 localOffset, Vector3 hipsRotation, float duration, float elastic = 1f, AnimationCurve curve = null, bool alignWithDesiredDir = false)
+            public ImpulseExecutor(Vector3 localOffset, Vector3 hipsRotation, float duration, float elastic = 1f, AnimationCurve curve = null, bool alignWithDesiredDir = false, Func<ImpulseExecutor, float> powerMultiplyAction = null)
             {
                 Elapsed = 0f;
                 PowerMultiplier = 1f;
@@ -71,9 +75,10 @@ namespace FIMSpace.FProceduralAnimation
                 if (curve == null) ImpulseCurve = DefaultCurve;
                 YAxisMultiplyCurve = DefaultCurve11;
                 AlignDesired = alignWithDesiredDir;
+                ImpulseMultiplyAction = powerMultiplyAction;
             }
 
-            public ImpulseExecutor(float duration, Vector3 worldOffset, float elastic = 1f, AnimationCurve curve = null, bool alignWithDesiredDir = false)
+            public ImpulseExecutor(float duration, Vector3 worldOffset, float elastic = 1f, AnimationCurve curve = null, bool alignWithDesiredDir = false, Func<ImpulseExecutor, float> powerMultiplyAction = null)
             {
                 Elapsed = 0f;
                 PowerMultiplier = 1f;
@@ -86,6 +91,7 @@ namespace FIMSpace.FProceduralAnimation
                 if (curve == null) ImpulseCurve = DefaultCurve;
                 YAxisMultiplyCurve = DefaultCurve11;
                 AlignDesired = alignWithDesiredDir;
+                ImpulseMultiplyAction = powerMultiplyAction;
             }
 
             public void Update(float delta)
@@ -115,7 +121,7 @@ namespace FIMSpace.FProceduralAnimation
 
         Vector3 _Hips_RotationElasticLocalOffset = Vector3.zero;
 
-        void Hips_Calc_UpdateImpulses()
+        protected virtual void Hips_Calc_UpdateImpulses()
         {
             _ImpulsesDoLocal = false;
             _ImpulsesDoWorld = false;
@@ -140,12 +146,15 @@ namespace FIMSpace.FProceduralAnimation
                 var impulse = Impulses[i];
                 impulse.Update(DeltaTime / ImpulsesDurationMultiplier);
 
+                float multiplier = 1f;
+                if (impulse.ImpulseMultiplyAction != null) multiplier = impulse.ImpulseMultiplyAction.Invoke(impulse);
+
                 if (impulse.WorldTranslation != Vector3.zero)
                 {
-                    Vector3 push = impulse.CurrentWorldOffset * ImpulsesPowerMultiplier;
+                    Vector3 push = impulse.CurrentWorldOffset * (ImpulsesPowerMultiplier * multiplier);
 
                     if (impulse.Elastic <= 0f)
-                        _ImpulsesWorldPush += push;
+                        _ImpulsesWorldPush += push ;
                     else if (impulse.Elastic >= 1f)
                         _ImpulsesWorldPushInherit += push;
                     else
@@ -157,7 +166,7 @@ namespace FIMSpace.FProceduralAnimation
 
                 if (impulse.LocalTranslation != Vector3.zero)
                 {
-                    Vector3 push = impulse.CurrentLocalOffset * (ImpulsesPowerMultiplier * ScaleReferenceNoScale);
+                    Vector3 push = impulse.CurrentLocalOffset * (ImpulsesPowerMultiplier * ScaleReferenceNoScale * multiplier);
                     push.y *= impulse.CurrentLocalYAxisMultiplier;
 
                     bool defaultLocal = true;
@@ -170,7 +179,7 @@ namespace FIMSpace.FProceduralAnimation
 
                             // Remap for desired dir and apply to world space impulse
                             Quaternion remap = BaseTransform.rotation * Quaternion.FromToRotation(BaseTransform.forward.normalized, desirDirNorm);
-                             push = remap * push;
+                            push = remap * push;
 
                             if (impulse.Elastic <= 0f)
                                 _ImpulsesWorldPush += push;
@@ -205,7 +214,7 @@ namespace FIMSpace.FProceduralAnimation
                 {
                     Vector3 rotImpulse = impulse.HipsRotation;
 
-                    if ( impulse.AlignDesired)
+                    if (impulse.AlignDesired)
                     {
                         if (Vector3.Dot(BaseTransform.forward.normalized, desirDirNorm) < 0f)
                         {
@@ -213,7 +222,7 @@ namespace FIMSpace.FProceduralAnimation
                         }
                     }
 
-                    _ImpulsesHipsRotation += rotImpulse * (ImpulsesPowerMultiplier * impulse.Evaluation * impulse.Power);
+                    _ImpulsesHipsRotation += rotImpulse * (ImpulsesPowerMultiplier * multiplier * impulse.Evaluation * impulse.Power);
                 }
 
                 Impulses[i] = impulse;

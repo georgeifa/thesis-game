@@ -130,6 +130,6 @@ AssetOrigin:
   productId: 127325
   packageName: Particle Pack
   packageVersion: 3.1
-  assetPath: Assets/UnityTechnologies/ParticlePack/Scenes/Main Scene with Legacy
-    Particles/Lightmap-2_comp_light.exr
-  uploadId: 691001
+  assetPath: Assets/Imported/UnityTechnologies/ParticlePack/Scenes/Main Scene with
+    Legacy Particles/Lightmap-2_comp_light.exr
+  uploadId: 896138

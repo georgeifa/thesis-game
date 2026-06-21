@@ -55,6 +55,9 @@ namespace FIMSpace.FProceduralAnimation
         public SerializedProperty sp__StepHeatPenaltyCurve;
         public SerializedProperty sp_RagdolledParameter;
 
+        public SerializedProperty sp_Rigidbody;
+        public SerializedProperty sp_Calibrate;
+
         protected virtual void OnEnable()
         {
             Get.Legs_RefreshLegsOwner();
@@ -101,6 +104,10 @@ namespace FIMSpace.FProceduralAnimation
             sp_ExtraHipsHubs = serializedObject.FindProperty("ExtraHipsHubs");
             sp__StepHeatPenaltyCurve = serializedObject.FindProperty("_StepHeatPenaltyCurve");
             sp_RagdolledParameter = serializedObject.FindProperty("RagdolledParameter");
+
+            sp_Calibrate = serializedObject.FindProperty("Calibrate");
+            sp_Rigidbody = serializedObject.FindProperty("Rigidbody");
+
 
             OnChange(false);
         }

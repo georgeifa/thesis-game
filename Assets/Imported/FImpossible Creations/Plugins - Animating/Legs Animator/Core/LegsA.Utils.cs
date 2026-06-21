@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace FIMSpace.FProceduralAnimation
 {
@@ -10,7 +11,7 @@ namespace FIMSpace.FProceduralAnimation
         public float Scale { get; private set; }
 
         protected bool legsWasDisabled = false;
-        protected void OnDisable()
+        protected virtual void OnDisable()
         {
             legsWasDisabled = true;
         }
@@ -34,8 +35,17 @@ namespace FIMSpace.FProceduralAnimation
             }
             else
             {
-                Quaternion rootTopSpace = Quaternion.FromToRotation(Vector3.ProjectOnPlane(baseTransform.forward, Up), Vector3.forward);
-                CastMx = Matrix4x4.TRS(BaseTransform.position, rootTopSpace, BaseTransform.lossyScale);
+                //Quaternion rootTopSpace = Quaternion.FromToRotation(Vector3.ProjectOnPlane(baseTransform.forward, Up), Vector3.forward);
+                //CastMx = Matrix4x4.TRS(BaseTransform.position, rootTopSpace, BaseTransform.lossyScale);
+                //InvCastMx = CastMx.inverse;
+
+                Vector3 fwd = baseTransform.forward;
+                if (Mathf.Abs(Vector3.Dot(fwd, Up)) > 0.99f) fwd = baseTransform.right;
+                Vector3 right = Vector3.Normalize(Vector3.Cross(Up, fwd));
+                Vector3 forward = Vector3.Cross(right, Up);
+
+                Quaternion rot = Quaternion.LookRotation(forward, Up);
+                CastMx = Matrix4x4.TRS(baseTransform.position, rot, baseTransform.lossyScale);
                 InvCastMx = CastMx.inverse;
             }
         }

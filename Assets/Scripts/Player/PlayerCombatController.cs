@@ -1,4 +1,3 @@
-using System.Collections;
 using MyBox;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -31,10 +30,10 @@ public class PlayerCombatController : MonoBehaviour
     private bool reloadPressed;
     private bool switchPressed;
     private EquipmentSlot nextSlot;
-
-    // timing
-    [SerializeField] private float equipTime = 0.4f;
-    [SerializeField] private float switchCooldown = 0.15f;
+    // Switch sequence — slots involved in the in-progress switch.
+    // Exposed so the switch animation events know which gun to move.
+    public EquipmentSlot SwitchOutgoingSlot { get; private set; }
+    private EquipmentSlot switchIncomingSlot;
 
     // for semi-auto behavior
     private bool wasHoldingFireLastFrame;
@@ -116,7 +115,7 @@ public class PlayerCombatController : MonoBehaviour
 
     private void HandleIdle()
     {
-        if (switchPressed)      { StartCoroutine(SwitchRoutine()); return; }
+        if (switchPressed)      { BeginSwitch(); return; }
         if (reloadPressed)      { SetState(CombatState.Reloading); return; }
         if (CanStartShooting()) { SetState(CombatState.Shooting);       }
     }
@@ -125,7 +124,7 @@ public class PlayerCombatController : MonoBehaviour
     {
         if (!wantsToShoot || !aimController.isAiming) { SetState(CombatState.Idle);      return; }
         if (reloadPressed)                            { SetState(CombatState.Reloading); return; }
-        if (switchPressed)                            { StartCoroutine(SwitchRoutine()); return; }
+        if (switchPressed)                            { BeginSwitch();                   return; }
     }
 
     private void HandleReloading()
@@ -147,9 +146,10 @@ public class PlayerCombatController : MonoBehaviour
         if (switchPressed)
         {
             CancelReload();
-            StartCoroutine(SwitchRoutine());
+            BeginSwitch();
             return;
         }
+
     }
 
     private void SetState(CombatState newState)
@@ -201,17 +201,49 @@ public class PlayerCombatController : MonoBehaviour
     public void ToggleWeapon()
     {
         if (currentState == CombatState.SwitchingWeapon) return;
-
-        EquipmentSlot next = equipmentManager.GetNextWeaponSlot();
-        if (!equipmentManager.CanSwitchTo(next)) return;
-
-        RequestSwitch(next);
+        RequestSwitch(equipmentManager.GetNextWeaponSlot());
     }
 
-    private void RequestSwitch(EquipmentSlot slot)
+    /// <summary>Requests a switch to a specific slot (the slot-generic seam for throwables later).</summary>
+    public void RequestSwitch(EquipmentSlot slot)
     {
+        if (!equipmentManager.CanSwitchTo(slot)) return;
         switchPressed = true;
         nextSlot = slot;
+    }
+
+    /// <summary>
+    /// Starts the switch: locks state, records outgoing/incoming slots, fires the
+    /// stow animation. The rest is advanced by animation events
+    /// (OnStowComplete -> OnDrawComplete).
+    /// </summary>
+    private void BeginSwitch()
+    {
+        SwitchOutgoingSlot = equipmentManager.CurrentSlot;
+        switchIncomingSlot = nextSlot;
+
+        SetState(CombatState.SwitchingWeapon);
+        activeGun?.ForceStop();
+        wasHoldingFireLastFrame = true;
+
+        animationsManager.TriggerStow(SwitchOutgoingSlot);
+    }
+
+    /// <summary>
+    /// Animation event (stow clip end). Outgoing weapon is now on its body
+    /// socket — swap the active slot and start the draw for the incoming weapon.
+    /// </summary>
+    public void OnStowComplete()
+    {
+        equipmentManager.SwitchTo(switchIncomingSlot);
+        animationsManager.TriggerDraw(switchIncomingSlot);
+    }
+
+    /// <summary>Animation event (draw clip end). Switch complete — return to Idle.</summary>
+    public void OnDrawComplete()
+    {
+        if (currentState == CombatState.SwitchingWeapon)
+            SetState(CombatState.Idle);
     }
 
     private void HandleGunChanged(Gun newGun)
@@ -234,25 +266,11 @@ public class PlayerCombatController : MonoBehaviour
         activeGun.OnAmmoChanged    -= HandleAmmoChanged;
     }
 
-    private IEnumerator SwitchRoutine()
-    {
-        SetState(CombatState.SwitchingWeapon);
-
-        activeGun?.ForceStop();
-        wasHoldingFireLastFrame = true;
-
-        yield return new WaitForSeconds(equipTime);
-
-        equipmentManager.SwitchTo(nextSlot);
-
-        SetState(CombatState.Idle);
-    }
-
 #endregion
 
     private void HandleAmmoChanged(int clip, int total)
     {
-        Debug.Log($"Ammo: {clip}/{total}");
+        //Debug.Log($"Ammo: {clip}/{total}");
         // later: update UI
     }
 

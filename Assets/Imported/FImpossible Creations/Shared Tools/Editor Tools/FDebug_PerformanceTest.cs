@@ -247,7 +247,7 @@ namespace FIMSpace
 
             EditorGUILayout.EndVertical();
             var rect = GUILayoutUtility.GetLastRect();
-            if (GUI.Button(rect, GUIContent.none, EditorStyles.label)) { _foldout = false; }
+            if (GUI.Button(rect, GUIContent.none, EditorStyles.label)) { _foldout = !_foldout; }
 
             return updateDisp;
         }

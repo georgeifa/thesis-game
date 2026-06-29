@@ -24,6 +24,10 @@ public class PlayerEquipmentManager : MonoBehaviour
     [Header("Spawn")]
     [SerializeField] private Transform weaponParent;
 
+    [Header("Body Sockets (slot-derived stow homes)")]
+    [SerializeField] private Transform backSocket;     // Primary stows here
+    [SerializeField] private Transform waistSocket;    // Secondary stows here
+
     [Header("IK Targets (persistent proxies on Player)")]
     [SerializeField] private Transform Grip;       // follows ref_grip on active gun
     [SerializeField] private Transform Trigger;    // follows ref_trigger on active gun
@@ -39,6 +43,7 @@ public class PlayerEquipmentManager : MonoBehaviour
     private EquipmentSlot currentSlot = EquipmentSlot.None;
 
     public GameObject ActiveGun { get; private set; }
+    public EquipmentSlot CurrentSlot => currentSlot;
 
     public System.Action<Gun> OnGunChanged;
 
@@ -53,7 +58,7 @@ public class PlayerEquipmentManager : MonoBehaviour
     private void Start()
     {
         EquipInitialLoadout();
-        SwitchTo(EquipmentSlot.Primary);
+        MakeActiveAndHold(EquipmentSlot.Primary);
     }
 
     private void Update()
@@ -71,6 +76,11 @@ public class PlayerEquipmentManager : MonoBehaviour
     {
         EquipGun(Primary,   EquipmentSlot.Primary);
         EquipGun(Secondary, EquipmentSlot.Secondary);
+
+        // Both guns visible. Park each on its body socket; SwitchTo() then
+        // pulls the starting weapon into the hand.
+        ParkOnBodySocket(EquipmentSlot.Primary);
+        ParkOnBodySocket(EquipmentSlot.Secondary);
     }
 
     private void EquipGun(GunScriptableObject data, EquipmentSlot slot)
@@ -80,7 +90,6 @@ public class PlayerEquipmentManager : MonoBehaviour
         Gun gun = obj.GetComponent<Gun>();
         gun.Initialize(data);
 
-        obj.SetActive(false);
 
         equippedGuns[slot] = gun;
     }
@@ -89,26 +98,36 @@ public class PlayerEquipmentManager : MonoBehaviour
     //  Switching
     // ─────────────────────────────────────────────
 
+/// <summary>
+    /// Logical swap only: makes <paramref name="slot"/> the active weapon
+    /// (caches refs, fires OnGunChanged) WITHOUT moving the gun's transform.
+    /// During a switch the gun stays on its body socket until the draw blink
+    /// reparents it to the hand. Startup uses MakeActiveAndHold() instead.
+    /// </summary>
     public void SwitchTo(EquipmentSlot slot)
     {
         if (currentSlot == slot) return;
 
-        // Deactivate old gun
-        if (equippedGuns.TryGetValue(currentSlot, out Gun oldGun))
-            oldGun.gameObject.SetActive(false);
-
         currentSlot = slot;
 
-        // Activate new gun
         if (equippedGuns.TryGetValue(slot, out Gun newGun))
         {
-            newGun.gameObject.SetActive(true);
             ActiveGun = newGun.gameObject;
-
             CacheGunReferences(newGun);
 
             OnGunChanged?.Invoke(newGun);
         }
+    }
+
+    /// <summary>
+    /// Logical swap PLUS physically place the gun in the hand (holder).
+    /// Used at startup, where there is no draw animation to place it.
+    /// </summary>
+    private void MakeActiveAndHold(EquipmentSlot slot)
+    {
+        SwitchTo(slot);
+        if (ActiveGun != null)
+            AttachGunToHolder(ActiveGun.GetComponent<Gun>());
     }
 
     public EquipmentSlot GetNextWeaponSlot()
@@ -136,15 +155,51 @@ public class PlayerEquipmentManager : MonoBehaviour
     /// Each weapon's mesh pivot differs, so the gun carries its own in-hand
     /// pose offset (HoldPositionOffset / HoldRotationOffset on its GunData).
     /// </summary>
+    /// 
+    /// <summary>The body socket a slot stows to (slot-derived).</summary>
+    private Transform GetBodySocket(EquipmentSlot slot)
+    {
+        return slot == EquipmentSlot.Primary ? backSocket : waistSocket;
+    }
+
+    /// <summary>
+    /// Parks a slot's gun on its body socket at local zero. Used at startup and
+    /// as the destination of a stow. (Per-gun body fit offset comes later — for
+    /// now it sits at local zero.)
+    /// </summary>
+    private void ParkOnBodySocket(EquipmentSlot slot)
+    {
+        if (!equippedGuns.TryGetValue(slot, out Gun gun)) return;
+
+        Transform socket = GetBodySocket(slot);
+        if (socket == null) return;
+
+        gun.transform.SetParent(socket);
+        gun.transform.localPosition = Vector3.zero;
+        gun.transform.localRotation = Quaternion.identity;
+    }
+
+    /// <summary>Parks a gun under WeaponHolder at local zero (rig-controlled in-hand pose).</summary>
+    private void AttachGunToHolder(Gun gun)
+    {
+        gun.transform.SetParent(weaponParent);
+        gun.transform.localPosition = Vector3.zero;
+        gun.transform.localRotation = Quaternion.identity;
+    }
+
+    /// <summary>Switch-sequence call (stow blink): parks the slot's gun on its body socket.</summary>
+    public void StowToBodySocket(EquipmentSlot slot) => ParkOnBodySocket(slot);
+
     public void AttachWeaponToHand()
     {
         if (ActiveGun == null || handWeaponSocket == null) return;
 
-        ActiveGun.transform.SetParent(handWeaponSocket);
+        Gun gun = ActiveGun.GetComponent<Gun>();
+        gun.ResetRecoil();                       // cancel any mid-spring recoil
 
-        GunScriptableObject data = ActiveGun.GetComponent<Gun>().gunData;
-        ActiveGun.transform.localPosition = data.HoldPositionOffset;
-        ActiveGun.transform.localRotation = Quaternion.Euler(data.HoldRotationOffset);
+        ActiveGun.transform.SetParent(handWeaponSocket);
+        ActiveGun.transform.localPosition = gun.gunData.HoldPositionOffset;
+        ActiveGun.transform.localRotation = Quaternion.Euler(gun.gunData.HoldRotationOffset);
     }
 
     /// <summary>
@@ -155,10 +210,7 @@ public class PlayerEquipmentManager : MonoBehaviour
     public void ReturnWeaponToHolder()
     {
         if (ActiveGun == null) return;
-
-        ActiveGun.transform.SetParent(weaponParent);
-        ActiveGun.transform.localPosition = Vector3.zero;
-        ActiveGun.transform.localRotation = Quaternion.identity;
+        AttachGunToHolder(ActiveGun.GetComponent<Gun>());
     }
 
     // ─────────────────────────────────────────────

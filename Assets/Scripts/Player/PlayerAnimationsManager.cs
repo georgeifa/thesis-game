@@ -1,35 +1,34 @@
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
+/// <summary>
+/// Used for actions/methods that affect the visuals of the players character
+/// Especially used for the animations in actions like reloading / gun swapping etc
+/// Contains event methods that are called from animations
+/// </summary>
 public class PlayerAnimationsManager : MonoBehaviour
 {
-    // ─────────────────────────────────────────────
-    //  Inspector References
-    // ─────────────────────────────────────────────
+    #region Inspector Fields
 
     [Header("Animator Layers")]
     [SerializeField] private string actionsLayerName = "Actions";
 
     [Header("Hand IK")]
-    // Both hands hand off to the animation during a scripted action.
-    // The reload clip already contains the correct hand motion, so IK just
-    // blends out at the start and back in at the end — no target switching.
+    // Hand IKs for the the two hands holding the guns
     [SerializeField] private TwoBoneIKConstraint leftHandIK;
     [SerializeField] private TwoBoneIKConstraint rightHandIK;
 
     [Header("Magazine Reparenting")]
-    // The mag is reparented to the left hand on grab and back to the gun's
-    // MagSocket on seat. The mag sits at local zero under MagSocket, so
-    // reseating is just "parent + zero" — no offset or recorded home needed.
+    // The location in the characters hand where the magazine goes 
     [SerializeField] private Transform magHandSocket;
 
     [Header("Blend Speed")]
     [SerializeField] private float ikBlendSpeed = 25f;
     [SerializeField] private float layerBlendSpeed = 6f;
 
-    // ─────────────────────────────────────────────
-    //  Private State
-    // ─────────────────────────────────────────────
+    #endregion
+
+    #region Private State
 
     private Animator animator;
     private PlayerCombatController combatController;
@@ -37,22 +36,25 @@ public class PlayerAnimationsManager : MonoBehaviour
 
     private int actionsLayerIndex;
 
-    // Blend targets (the value each hand IK weight is moving toward)
+    // Blend targets — the value each hand IK weight
     private float leftHandIKTargetWeight  = 1f;
-    private float rightHandIKTargetWeight  = 1f;
+    private float rightHandIKTargetWeight = 1f;
 
-    // Cached from the active gun
+    // Cached from the active gun (refreshed on weapon change)
     private GameObject magazineModel;
+    private Transform  magSocket;
     private GameObject droppedMagPrefab;
-    private float droppedMagLifetime;
-    private Transform magSocket;
+    private float      droppedMagLifetime;
 
     // Animator parameter hashes
     private static readonly int ReloadHash = Animator.StringToHash("Reload");
+    private static readonly int StowHash   = Animator.StringToHash("Stow");
+    private static readonly int DrawHash   = Animator.StringToHash("Draw");
+    private static readonly int SlotHash   = Animator.StringToHash("Slot");
+    private static readonly int CancelActionHash = Animator.StringToHash("CancelAction");
+    #endregion
 
-    // ─────────────────────────────────────────────
-    //  Unity Lifecycle
-    // ─────────────────────────────────────────────
+    #region Unity Lifecycle
 
     private void Awake()
     {
@@ -84,101 +86,26 @@ public class PlayerAnimationsManager : MonoBehaviour
             equipmentManager.OnGunChanged -= UpdateGunReferences;
     }
 
-    // ─────────────────────────────────────────────
-    //  Actions Layer Weight
-    // ─────────────────────────────────────────────
+    #endregion
 
-    private void UpdateActionsLayerWeight()
+    #region Actions Mehtods
+
+        #region Reload Related Methods
+
+    /// <summary>Fires the reload animation. Called by PlayerCombatController.</summary>
+    public void TriggerReload()
     {
-        float target  = combatController.currentState == CombatState.Reloading ? 1f : 0f;
-        float current = animator.GetLayerWeight(actionsLayerIndex);
-        animator.SetLayerWeight(actionsLayerIndex,
-            Mathf.MoveTowards(current, target, Time.deltaTime * layerBlendSpeed));
+        animator.ResetTrigger(CancelActionHash);
+        animator.SetTrigger(ReloadHash);
     }
-
-    // ─────────────────────────────────────────────
-    //  Hand IK (simple on/off blends)
-    // ─────────────────────────────────────────────
-
-    private void BlendLeftHandIK()
-    {
-        if (leftHandIK == null) return;
-        leftHandIK.weight = Mathf.MoveTowards(
-            leftHandIK.weight, leftHandIKTargetWeight, Time.deltaTime * ikBlendSpeed);
-    }
-
-    private void BlendRightHandIK()
-    {
-        if (rightHandIK == null) return;
-        rightHandIK.weight = Mathf.MoveTowards(
-            rightHandIK.weight, rightHandIKTargetWeight, Time.deltaTime * ikBlendSpeed);
-    }
-
-    private void SetLeftHandIK(float weight)  => leftHandIKTargetWeight  = weight;
-    private void SetRightHandIK(float weight) => rightHandIKTargetWeight = weight;
-
-    // ─────────────────────────────────────────────
-    //  Magazine Reparenting
-    // ─────────────────────────────────────────────
-
-    /// <summary>
-    /// Parents the mag to the left hand, keeping its current world position so
-    /// it doesn't jump — it grabs from wherever it currently sits on the gun
-    /// and rides the (animation-driven) hand from there.
-    /// </summary>
-    private void DetachMagToHand()
-    {
-        if (magazineModel == null || magHandSocket == null) return;
-        magazineModel.transform.SetParent(magHandSocket, worldPositionStays: false);
-        magazineModel.transform.localPosition = Vector3.zero;
-        magazineModel.transform.localRotation = Quaternion.identity;
-    }
-
-    /// <summary>
-    /// Parents the mag back to the gun's MagSocket at local zero, which is its
-    /// authored seated position. No offset needed — the socket is the home.
-    /// </summary>
-    private void ReseatMag()
-    {
-        if (magazineModel == null || magSocket == null) return;
-        magazineModel.transform.SetParent(magSocket);
-        magazineModel.transform.localPosition = Vector3.zero;
-        magazineModel.transform.localRotation = Quaternion.identity;
-    }
-
-    // ─────────────────────────────────────────────
-    //  Gun Reference Update (fired on weapon switch)
-    // ─────────────────────────────────────────────
-
-    private void UpdateGunReferences(Gun newGun)
-    {
-        if (newGun == null) return;
-
-        magazineModel = newGun.References.MagazineModel;
-        magSocket     = newGun.References.MagSocket;
-        droppedMagPrefab = newGun.gunData.DroppedMagPrefab;
-        droppedMagLifetime = newGun.gunData.droppedMagLifetime;
-
-        if (magazineModel != null)
-            magazineModel.SetActive(true);
-    }
-
-    // ─────────────────────────────────────────────
-    //  Animator Trigger
-    // ─────────────────────────────────────────────
-
-    public void TriggerReload() => animator.SetTrigger(ReloadHash);
-
-    // ─────────────────────────────────────────────
-    //  Reload Abort / Cleanup
-    // ─────────────────────────────────────────────
-
     /// <summary>
     /// Called by PlayerCombatController when a reload is interrupted.
-    /// Returns the gun to the holder, reseats the mag, restores both hands.
+    /// Returns the gun to the holder, reseats the mag, and restores both hands.
     /// </summary>
     public void AbortReload()
     {
+        animator.SetTrigger(CancelActionHash);
+
         equipmentManager.ReturnWeaponToHolder();
         ReseatMag();
 
@@ -189,40 +116,68 @@ public class PlayerAnimationsManager : MonoBehaviour
             magazineModel.SetActive(true);
     }
 
-    // ─────────────────────────────────────────────
-    //  Animation Events (placed on the reload clip)
-    // ─────────────────────────────────────────────
+    #endregion
 
-    // ── Frame 0 ──────────────────────────────────
+        #region Switch Related Methods
+
     /// <summary>
-    /// Reload begins. Parent the gun into the right hand and hand BOTH hands
-    /// over to the animation (IK → 0). The clip drives the hand motion; no IK
-    /// fights it, so the hands follow the animation cleanly.
+    /// Fires the stow animation for the given slot. Slot is set BEFORE the
+    /// trigger so the two-condition transition (trigger + Slot) routes correctly.
+    /// </summary>
+    public void TriggerStow(EquipmentSlot slot)
+    {
+        animator.ResetTrigger(CancelActionHash);  // clear any pending cancel from an interrupted reload
+
+        animator.SetInteger(SlotHash, (int)slot);
+        animator.SetTrigger(StowHash);
+    }
+
+    /// <summary>Fires the draw animation for the given slot (Slot first, then trigger).</summary>
+    public void TriggerDraw(EquipmentSlot slot)
+    {
+        animator.SetInteger(SlotHash, (int)slot);
+        animator.SetTrigger(DrawHash);
+    }
+
+    #endregion
+
+    #endregion
+
+    #region Animation Events
+
+        #region Reload
+
+    // The reload clip fires these in order. Each is a single visual step;
+    // the frame label is the order of the events in the clip
+
+    /// <summary>
+    /// Frame 0 — Reload BEGINS.
+    /// Disable IKs and attach the weapon to the right hand
     /// </summary>
     public void Reload_HandOffToAnimation()
     {
+        if (combatController.currentState != CombatState.Reloading) return;
         equipmentManager.AttachWeaponToHand();
         SetRightHandIK(0f);
         SetLeftHandIK(0f);
     }
 
-    // ── Frame X ──────────────────────────────────
     /// <summary>
-    /// Hand has reached the magazine — reparent the mag to the left hand so it
-    /// pulls free with the hand as the animation drives it.
+    /// Frame A — Hand GRABS the magazine. Reparent the mag to the hand so
+    /// it pulls free with the hand as the animation drives it
     /// </summary>
-    public void Reload_GrabMag() => DetachMagToHand();
+    public void Reload_GrabMag()
+    {
+        if (combatController.currentState != CombatState.Reloading) return;
+        DetachMagToHand();
+    }
 
-    // ── Frame Z ──────────────────────────────────
     /// <summary>
-    /// Spawn a physics clone of the mag at its current position and hide the
-    /// real mesh; the clone handles the visual drop to the ground.
+    /// Frame B — Spawn a physics clone of the mag at its current position and
+    /// hide the real mesh to create the illusion of dropping the magazine to the ground
     /// </summary>
     public void Reload_DropMag()
     {
-        Debug.Log("Here, magazine model" + magazineModel);
-        Debug.Log("Here, droppedMagPrefab" + droppedMagPrefab);
-
         if (magazineModel == null || droppedMagPrefab == null) return;
 
         GameObject dropped = Instantiate(
@@ -243,11 +198,9 @@ public class PlayerAnimationsManager : MonoBehaviour
         magazineModel.SetActive(false);
     }
 
-    // ── Frame E ──────────────────────────────────
     /// <summary>
-    /// Re-enable the mag mesh as the "new" magazine from the hip and refill
-    /// ammo. Safe even if interrupted after this point. The mesh is still
-    /// parented to the hand here, so it appears in the hand as the new mag.
+    /// Frame C — Reenable the magazine mesh in hand.
+    /// To create the illusion of grabbing a new magazine from the waist
     /// </summary>
     public void Reload_GrabNewMag()
     {
@@ -257,24 +210,164 @@ public class PlayerAnimationsManager : MonoBehaviour
         combatController.OnNewMagGrabbed();
     }
 
-    // ── Frame Y (second) ─────────────────────────
-    /// <summary>
-    /// Mag is seated back into the gun — reparent it to the gun's MagSocket.
-    /// </summary>
+    /// <summary>Frame D — Seat the mag back into the gun (reparent to MagSocket).</summary>
     public void Reload_SeatMag() => ReseatMag();
 
-    // ── Frame O (last frame) ─────────────────────
     /// <summary>
-    /// Reload complete. Return the gun to the holder, hand both hands back to
-    /// IK, and tell the combat controller the reload is finished.
+    /// Frame E — Reload COMPLETE.
+    /// Detach the gun from the right hand and re-enable the IKs
     /// </summary>
     public void Reload_HandBackToIK()
     {
         equipmentManager.ReturnWeaponToHolder();
-
         SetRightHandIK(1f);
         SetLeftHandIK(1f);
 
         combatController.OnReloadAnimationEnd();
     }
+
+    #endregion
+
+        #region Weapon Switch
+
+    /// <summary>
+    /// Stow begin — attach the active gun to the hand and hand the right hand to
+    /// the animation, so the gun follows the hand toward the body.
+    /// </summary>
+    public void Switch_StowBegin()
+    {
+        equipmentManager.AttachWeaponToHand();
+        SetRightHandIK(0f);
+        SetLeftHandIK(0f);
+    }
+
+    /// <summary>Stow reparent (mid) — blink the gun from the hand onto its body socket.</summary>
+    public void Switch_StowReparent()
+    {
+        equipmentManager.StowToBodySocket(combatController.SwitchOutgoingSlot);
+    }
+
+    /// <summary>Stow complete (end) — swap active slot and start the draw.</summary>
+    public void Switch_StowComplete()
+    {
+        combatController.OnStowComplete();
+    }
+
+    /// <summary>Draw begin — hand the right hand to the animation for the draw.</summary>
+    public void Switch_DrawBegin()
+    {
+        SetRightHandIK(0f);
+        SetLeftHandIK(0f);
+
+    }
+
+    /// <summary>
+    /// Draw reparent (mid) — blink the now-active gun from its body socket into
+    /// the hand so it rides the hand out to ready.
+    /// </summary>
+    public void Switch_DrawReparent()
+    {
+        equipmentManager.AttachWeaponToHand();
+    }
+
+    /// <summary>Draw complete (end) — gun to holder, hand back to IK, switch done.</summary>
+    public void Switch_DrawComplete()
+    {
+        equipmentManager.ReturnWeaponToHolder();
+        SetRightHandIK(1f);
+        SetLeftHandIK(1f);
+        combatController.OnDrawComplete();
+    }
+
+    #endregion
+   
+    #endregion
+
+    #region Helper Methods
+
+        #region Actions Layer Weight
+
+    // Blends the animation Actions layer in and out depending on if we want to do an action or not
+    private void UpdateActionsLayerWeight()
+    {
+        bool actionActive =
+            combatController.currentState == CombatState.Reloading ||
+            combatController.currentState == CombatState.SwitchingWeapon;
+
+        float target  = actionActive ? 1f : 0f;
+        float current = animator.GetLayerWeight(actionsLayerIndex);
+        animator.SetLayerWeight(actionsLayerIndex,
+            Mathf.MoveTowards(current, target, Time.deltaTime * layerBlendSpeed));
+    }
+
+    #endregion
+
+        #region Hand IKs
+
+    private void BlendLeftHandIK()
+    {
+        if (leftHandIK == null) return;
+        leftHandIK.weight = Mathf.MoveTowards(
+            leftHandIK.weight, leftHandIKTargetWeight, Time.deltaTime * ikBlendSpeed);
+    }
+
+    private void BlendRightHandIK()
+    {
+        if (rightHandIK == null) return;
+        rightHandIK.weight = Mathf.MoveTowards(
+            rightHandIK.weight, rightHandIKTargetWeight, Time.deltaTime * ikBlendSpeed);
+    }
+
+        private void SetLeftHandIK(float weight)
+        {
+            leftHandIKTargetWeight = weight;
+        }
+    private void SetRightHandIK(float weight) => rightHandIKTargetWeight = weight;
+
+    #endregion
+
+        #region Magazine Reparenting
+
+    // Attach the mag to the hand so it can follow the animation
+    private void DetachMagToHand()
+    {
+        if (magazineModel == null || magHandSocket == null) return;
+        magazineModel.transform.SetParent(magHandSocket, worldPositionStays: false);
+        magazineModel.transform.localPosition = Vector3.zero;
+        magazineModel.transform.localRotation = Quaternion.identity;
+    }
+
+    // Detach the mag from the hands so it can be controlled from the IKs
+    private void ReseatMag()
+    {
+
+        if (magazineModel == null || magSocket == null) return;
+        magazineModel.transform.SetParent(magSocket);
+        magazineModel.transform.localPosition = Vector3.zero;
+        magazineModel.transform.localRotation = Quaternion.identity;
+
+    }
+
+    #endregion
+
+        #region Gun Reference Caching
+
+    // Refreshes the per-gun references whenever the active weapon changes.
+    private void UpdateGunReferences(Gun newGun)
+    {
+        if (newGun == null) return;
+
+        magazineModel      = newGun.References.MagazineModel;
+        magSocket          = newGun.References.MagSocket;
+        droppedMagPrefab   = newGun.gunData.DroppedMagPrefab;
+        droppedMagLifetime = newGun.gunData.droppedMagLifetime;
+
+        if (magazineModel != null)
+            magazineModel.SetActive(true);
+    }
+
+    #endregion
+
+    #endregion
+
 }

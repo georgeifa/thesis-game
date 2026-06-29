@@ -16,6 +16,8 @@ MonoBehaviour:
   Type: 1
   Name: AR
   GunPrefab: {fileID: 779918907432351797, guid: 42d03bda482c47743ba968b1f25a2198, type: 3}
+  DroppedMagPrefab: {fileID: 1142805415186994014, guid: 3fa81c880cfff2042a7bb6824afe1fba, type: 3}
+  droppedMagLifetime: 3
   SpawnPoint: {x: 0, y: 0, z: 0}
   SpawnRotation: {x: 0, y: 0, z: 0}
   HoldPositionOffset: {x: -0.18, y: -0.2, z: 0.08}

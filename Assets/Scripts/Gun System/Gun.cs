@@ -306,6 +306,13 @@ public class Gun : MonoBehaviour
         currentVelocity = Vector3.zero;
     }
 
+    public void ResetRecoil()
+    {
+        applyRecoil = false;
+        currentVelocity = Vector3.zero;
+        // don't touch localPosition here — the caller sets it (hold offset / zero)
+    }
+
 #endregion
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created

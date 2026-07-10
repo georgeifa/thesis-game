@@ -46,12 +46,18 @@ public class PlayerAnimationsManager : MonoBehaviour
     private GameObject droppedMagPrefab;
     private float      droppedMagLifetime;
 
+    [SerializeField] private Transform grenadeHandSocket;  // on the throw hand
+    private GameObject heldThrowableInstance;
+
+
     // Animator parameter hashes
     private static readonly int ReloadHash = Animator.StringToHash("Reload");
     private static readonly int StowHash   = Animator.StringToHash("Stow");
     private static readonly int DrawHash   = Animator.StringToHash("Draw");
     private static readonly int SlotHash   = Animator.StringToHash("Slot");
     private static readonly int CancelActionHash = Animator.StringToHash("CancelAction");
+    private static readonly int ThrowRaiseHash = Animator.StringToHash("ThrowRaise");
+    private static readonly int ThrowHash      = Animator.StringToHash("Throw");
     #endregion
 
     #region Unity Lifecycle
@@ -71,6 +77,8 @@ public class PlayerAnimationsManager : MonoBehaviour
 
         if (equipmentManager.ActiveGun != null)
             UpdateGunReferences(equipmentManager.ActiveGun.GetComponent<Gun>());
+
+        SetupHeldGrenade();
     }
 
     private void Update()
@@ -142,6 +150,17 @@ public class PlayerAnimationsManager : MonoBehaviour
     #endregion
 
     #endregion
+
+/// <summary>Starts the grenade RAISE animation (held at over-shoulder by the Animator).</summary>
+    public void TriggerThrowRaise()
+    {
+        animator.ResetTrigger(CancelActionHash); // if you added CancelAction for reload interrupts
+        SetRightHandIK(0f);   // right arm animation-driven for the throw
+        animator.SetTrigger(ThrowRaiseHash);
+    }
+ 
+    /// <summary>Commits the THROW (plays the throw clip out of the hold).</summary>
+    public void TriggerThrow() => animator.SetTrigger(ThrowHash);
 
     #region Animation Events
 
@@ -281,6 +300,62 @@ public class PlayerAnimationsManager : MonoBehaviour
 
     #endregion
    
+   #region Throw
+ 
+    /// <summary>
+    /// Throw RELEASE frame — the hand lets go. Tell the combat controller to
+    /// spawn and launch the grenade toward the current cursor point.
+    /// </summary>
+     public void Throw_Release()
+    {
+        Throw_HideGrenade();
+        combatController.OnThrowRelease();
+    }
+ 
+    /// <summary>Throw end — restore the right hand to IK and finish the throw.</summary>
+    public void Throw_End()
+    {
+        SetRightHandIK(1f);
+        combatController.OnThrowAnimationEnd();
+    }
+
+        #region Throw — Held Grenade Prop
+    
+        /// <summary>
+        /// Instantiates the equipped grenade's in-hand mesh into the throw-hand
+        /// socket once, hidden. The prop's identity comes from the SO, so each
+        /// throwable type shows its own mesh. Called once at startup.
+        /// </summary>
+        private void SetupHeldGrenade()
+        {
+            ThrowableScriptableObject grenade = equipmentManager.EquippedGrenade;
+            if (grenade == null || grenade.ThrowableModel == null || grenadeHandSocket == null)
+                return;
+    
+            heldThrowableInstance = Instantiate(grenade.ThrowableModel, grenadeHandSocket);
+            heldThrowableInstance.transform.localPosition = Vector3.zero;
+            heldThrowableInstance.transform.localRotation = Quaternion.identity;
+            heldThrowableInstance.SetActive(false);
+        }
+    
+        /// <summary>Shows the held grenade (throw raise start).</summary>
+        public void Throw_ShowGrenade()
+        {
+            if (heldThrowableInstance != null)
+                heldThrowableInstance.SetActive(true);
+        }
+    
+        /// <summary>Hides the held grenade (at release, as the real grenade launches).</summary>
+        public void Throw_HideGrenade()
+        {
+            if (heldThrowableInstance != null)
+                heldThrowableInstance.SetActive(false);
+        }
+    
+        #endregion
+ 
+    #endregion
+   
     #endregion
 
     #region Helper Methods
@@ -292,7 +367,8 @@ public class PlayerAnimationsManager : MonoBehaviour
     {
         bool actionActive =
             combatController.currentState == CombatState.Reloading ||
-            combatController.currentState == CombatState.SwitchingWeapon;
+            combatController.currentState == CombatState.SwitchingWeapon ||
+            combatController.currentState == CombatState.Throwing;;
 
         float target  = actionActive ? 1f : 0f;
         float current = animator.GetLayerWeight(actionsLayerIndex);

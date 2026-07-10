@@ -11,6 +11,8 @@ public class PlayerInputManager : MonoBehaviour
     [SerializeField] private string fireActionName;
     [SerializeField] private string reloadActionName;
     [SerializeField] private string weaponSwapActionName;
+    [SerializeField] private string throwActionName;
+
 
 
 
@@ -24,11 +26,13 @@ public class PlayerInputManager : MonoBehaviour
     private InputAction fireAction;
     private InputAction reloadAction;
     private InputAction scrollAction;
+    private InputAction throwAction;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
     bool aimingPressed;
     bool firePressed;
     bool reloadPressed;
+    bool throwPressed;
     Vector2 scroll;
     void Start()
     {
@@ -49,6 +53,7 @@ public class PlayerInputManager : MonoBehaviour
         reloadAction = playerInput.actions[reloadActionName];
         mousePosition = playerInput.actions[mousePositionActionName];  
         scrollAction = playerInput.actions[weaponSwapActionName];  
+        throwAction = playerInput.actions[throwActionName];
     }
 
     void ReadInput()
@@ -57,6 +62,7 @@ public class PlayerInputManager : MonoBehaviour
         firePressed = fireAction.IsPressed();
         reloadPressed = reloadAction.IsPressed();
         scroll = scrollAction.ReadValue<Vector2>();
+        throwPressed = throwAction.IsPressed();
     }
     // Update is called once per frame
     void Update()
@@ -66,11 +72,17 @@ public class PlayerInputManager : MonoBehaviour
         if(reloadPressed)
             combatController.SetReload();
             
-        aimController.Aim(aimingPressed || firePressed,mousePosition);
+        if (combatController.currentState != CombatState.Throwing)
+            aimController.Aim(aimingPressed || firePressed,mousePosition);
         combatController.SetFire(firePressed);
 
         if(scroll.y != 0)
             combatController.ToggleWeapon();
+
+        if (combatController.currentState == CombatState.Throwing)
+            aimController.RotateTowardsCursor(mousePosition);
+        
+        combatController.SetThrowHeld(throwPressed);
     }
 
     public InputAction GetMousePosition()

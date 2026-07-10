@@ -59,28 +59,13 @@ public class PlayerAimController : MonoBehaviour
     {
         if (aimingPressed)
         {
-            //var (success, position) = Helpers.MousePositionToIsometric(mainCamera, mousePosition, groundMask,weapon.transform.position.y);
             float y = equipmentManager.ActiveGun.GetComponentInChildren<ParticleSystem>().transform.position.y;
-            var (success, position) = Helpers.MousePositionToIsometric(mainCamera, mousePosition, groundMask,y);
-            
+            var (success, position) = Helpers.MousePositionToIsometric(mainCamera, mousePosition, groundMask, y);
+
             if (success)
             {
-                //weapon.SetAimPosition(position);
-                var direction = position - transform.position;
-
-
-                direction.y = 0;
-
-
-                // Only rotate if direction is significant
-                if (direction.sqrMagnitude > 0.01f)
-                {
-                    transform.forward = Vector3.Slerp(transform.forward, direction, rotationTimeAim * Time.deltaTime);
-                }
-
-                
-                isAiming = true;
-                aimingRig.weight = Mathf.MoveTowards(aimingRig.weight, 1, Time.deltaTime * aimDuration);
+                RotateTowards(position);           // ← the rotation part, extracted
+                aimingRig.weight = Mathf.MoveTowards(aimingRig.weight, 1, Time.deltaTime * aimDuration);  // gun-aim pose
             }
         }
         else if (!transform.forward.Equals(Vector3.forward))
@@ -88,6 +73,25 @@ public class PlayerAimController : MonoBehaviour
             isAiming = false;
             aimingRig.weight = Mathf.MoveTowards(aimingRig.weight, 0, Time.deltaTime * aimDuration);
         }
+    }
+
+    // NEW — rotate toward the cursor WITHOUT the gun-aim rig/pose. For the throw.
+    public void RotateTowardsCursor(InputAction mousePosition)
+    {
+        var (success, position) = Helpers.MousePositionToIsometric(mainCamera, mousePosition, groundMask, 0f);
+        if (success)
+            RotateTowards(position);
+    }
+
+    // Shared rotation logic
+    private void RotateTowards(Vector3 targetPoint)
+    {
+        var direction = targetPoint - transform.position;
+        direction.y = 0;
+        if (direction.sqrMagnitude > 0.01f)
+            transform.forward = Vector3.Slerp(transform.forward, direction, rotationTimeAim * Time.deltaTime);
+        isAiming = true;
+
     }
 
     void HandleAnimations()

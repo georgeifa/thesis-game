@@ -46,7 +46,7 @@ public class ThrowGrenadeSkill : SkillsScriptableObject
         Rigidbody rb = grenade.GetComponent<Rigidbody>();
         
         // Calculate velocity for arc
-        Vector3 velocity = CalculateArcVelocity(throwPoint, player.transform.position);
+        Vector3 velocity = Helpers.CalculateArcVelocity(throwPoint, player.transform.position,minArcHeight,maxArcHeight);
         
         // Apply velocity
         rb.linearVelocity = velocity;
@@ -69,31 +69,6 @@ public class ThrowGrenadeSkill : SkillsScriptableObject
         
         grenade.BlastVFX = BlastVFX;
         grenade.ExplodeAfter = grenadeExplodeAfter;
-        grenade.PlayerLayer = playerLayer;
-    }
-    
-    private Vector3 CalculateArcVelocity(Vector3 start, Vector3 target)
-    {
-        // Get horizontal direction and distance
-        Vector3 horizontalDirection = target - start;
-        horizontalDirection.y = 0;  // Remove height difference
-        float horizontalDistance = horizontalDirection.magnitude;
-        
-        // Normalize for direction
-        horizontalDirection.Normalize();
-        
-        // Calculate time based on distance (faster for longer throws)
-        float flightTime = Mathf.Sqrt(horizontalDistance) * 0.5f;
-        
-        // Calculate vertical and horizontal velocities
-        // Random arc height
-        float arcHeight = Random.Range(minArcHeight, maxArcHeight);
-        float verticalVelocity = (arcHeight + (target.y - start.y)) / flightTime + 0.5f * Mathf.Abs(Physics.gravity.y) * flightTime;
-        float horizontalVelocity = horizontalDistance / flightTime;
-        
-        // Combine into final velocity
-        Vector3 velocity = (horizontalDirection * horizontalVelocity) + (Vector3.up * verticalVelocity);
-        
-        return velocity;
+        grenade.TargetLayer = playerLayer;
     }
 }

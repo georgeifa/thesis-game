@@ -51,6 +51,24 @@ public class PlayerEquipmentManager : MonoBehaviour
     private Transform gripRef;
     private Transform triggerRef;
 
+    
+// 1. ADD serialized fields (new [Header("Grenades")]):
+ 
+    [Header("Grenades")]
+    public ThrowableScriptableObject EquippedGrenade;   // the throwable definition (like Primary/Secondary for guns)
+    [SerializeField] private Transform throwPoint;    // empty on the hand — where grenades spawn
+    [SerializeField] private int startingGrenades = 3;
+ 
+ 
+// 2. ADD private state:
+ 
+    private ObjectPool grenadePool;
+    private int grenadeCount;
+ 
+    public int GrenadeCount => grenadeCount;
+    public Transform ThrowPoint => throwPoint;
+ 
+
     // ─────────────────────────────────────────────
     //  Unity Lifecycle
     // ─────────────────────────────────────────────
@@ -59,6 +77,9 @@ public class PlayerEquipmentManager : MonoBehaviour
     {
         EquipInitialLoadout();
         MakeActiveAndHold(EquipmentSlot.Primary);
+
+        grenadePool  = ObjectPool.CreateInstance(EquippedGrenade.GrenadePrefab, 10);
+        grenadeCount = startingGrenades;
     }
 
     private void Update()
@@ -222,4 +243,57 @@ public class PlayerEquipmentManager : MonoBehaviour
         gripRef    = gun.References.Grip;
         triggerRef = gun.References.Trigger;
     }
+
+
+    // 4. ADD the grenade region:
+ 
+    #region Grenades
+ 
+    /// <summary>True if the player has at least one grenade to throw.</summary>
+    public bool HasGrenades() => grenadeCount > 0;
+ 
+    /// <summary>
+    /// Pulls a grenade from the pool, configures it from the equipped
+    /// GrenadeScriptableObject, computes an arc velocity toward the target,
+    /// launches it, and decrements the count. Called at the throw release event.
+    /// </summary>
+    public void ThrowGrenade(Vector3 targetGroundPoint)
+    {
+        if (grenadeCount <= 0 || EquippedGrenade == null || throwPoint == null) return;
+ 
+        PoolableObject obj = grenadePool.GetObject();
+        obj.transform.SetPositionAndRotation(throwPoint.position, Quaternion.identity);
+        obj.gameObject.SetActive(true);
+ 
+        Grenade grenade = obj.GetComponent<Grenade>();
+        ConfigureGrenade(grenade);
+ 
+        Vector3 velocity = Helpers.CalculateArcVelocity(
+            throwPoint.position, targetGroundPoint,
+            EquippedGrenade.MinArcHeight, EquippedGrenade.MaxArcHeight);
+ 
+        grenade.Launch(velocity);
+ 
+        grenadeCount--;
+    }
+ 
+    // Configures a pooled grenade from the equipped grenade's data.
+    private void ConfigureGrenade(Grenade grenade)
+    {
+        grenade.BlastRadius  = EquippedGrenade.BlastRadius;
+        grenade.Damage       = EquippedGrenade.Damage;
+        grenade.ExplodeAfter = EquippedGrenade.ExplodeAfter;
+        grenade.TargetLayer  = EquippedGrenade.TargetLayer;
+ 
+        ObjectPool vfxPool = ObjectPool.CreateInstance(EquippedGrenade.ExplosionVFX.explosionPrefab, 5);
+        PoolableObject blastVFX = vfxPool.GetObject();
+        blastVFX.gameObject.SetActive(false);
+        EquippedGrenade.ExplosionVFX.SetupExplosion(blastVFX.gameObject);
+ 
+        grenade.BlastVFX = blastVFX;
+    }
+ 
+    #endregion
+ 
+ 
 }

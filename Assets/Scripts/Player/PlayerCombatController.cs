@@ -10,7 +10,8 @@ public enum CombatState
     Idle,
     Shooting,
     Reloading,
-    SwitchingWeapon
+    SwitchingWeapon,
+    Throwing
 }
 
 public class PlayerCombatController : MonoBehaviour
@@ -37,6 +38,11 @@ public class PlayerCombatController : MonoBehaviour
 
     // for semi-auto behavior
     private bool wasHoldingFireLastFrame;
+
+    private bool throwHeld;              // is G currently held (set each frame by input)
+    private bool wasThrowHeldLastFrame;  // for edge detection
+
+    [SerializeField] private LayerMask groundMask;  
 
 #region Initializations
     private void Awake()
@@ -79,6 +85,7 @@ public class PlayerCombatController : MonoBehaviour
 
     public void SetFire(bool pressed) => wantsToShoot = pressed;
     public void SetReload()           => reloadPressed = true;
+    public void SetThrowHeld(bool held) => throwHeld = held;
 
 #endregion
 
@@ -91,6 +98,7 @@ public class PlayerCombatController : MonoBehaviour
         switchPressed = false;
 
         wasHoldingFireLastFrame = wantsToShoot;
+        wasThrowHeldLastFrame = throwHeld;
     }
 
     private void UpdateGun()
@@ -110,12 +118,14 @@ public class PlayerCombatController : MonoBehaviour
             case CombatState.Shooting:        HandleShooting();           break;
             case CombatState.Reloading:       HandleReloading();          break;
             case CombatState.SwitchingWeapon: /* locked */                break;
+            case CombatState.Throwing: HandleThrowing(); break;
         }
     }
 
     private void HandleIdle()
     {
         if (switchPressed)      { BeginSwitch(); return; }
+        if (ThrowPressedThisFrame() && equipmentManager.HasGrenades()) { BeginThrow(); return; }
         if (reloadPressed)      { SetState(CombatState.Reloading); return; }
         if (CanStartShooting()) { SetState(CombatState.Shooting);       }
     }
@@ -123,6 +133,7 @@ public class PlayerCombatController : MonoBehaviour
     private void HandleShooting()
     {
         if (!wantsToShoot || !aimController.isAiming) { SetState(CombatState.Idle);      return; }
+        if (ThrowPressedThisFrame() && equipmentManager.HasGrenades()) { BeginThrow(); return; }
         if (reloadPressed)                            { SetState(CombatState.Reloading); return; }
         if (switchPressed)                            { BeginSwitch();                   return; }
     }
@@ -173,6 +184,9 @@ public class PlayerCombatController : MonoBehaviour
                 break;
 
             case CombatState.SwitchingWeapon:
+                activeGun?.ForceStop();
+                break;
+            case CombatState.Throwing:
                 activeGun?.ForceStop();
                 break;
         }
@@ -361,4 +375,68 @@ public class PlayerCombatController : MonoBehaviour
     private void HandleReloadFinished() => Debug.Log("Reload finished");
 
 #endregion
+
+ #region Throwing
+ 
+    // G newly pressed this frame (was up last frame, down now).
+    private bool ThrowPressedThisFrame() => throwHeld && !wasThrowHeldLastFrame;
+ 
+    // G newly released this frame (was down last frame, up now).
+    private bool ThrowReleasedThisFrame() => !throwHeld && wasThrowHeldLastFrame;
+ 
+    /// <summary>
+    /// Enters the throw: locks state and starts the RAISE animation, which the
+    /// Animator holds at the over-shoulder pose until the release.
+    /// </summary>
+    private void BeginThrow()
+    {
+        SetState(CombatState.Throwing);
+        activeGun?.ForceStop();
+        wasHoldingFireLastFrame = true;   // require a fresh fire-click after throwing
+ 
+        animationsManager.TriggerThrowRaise();
+    }
+ 
+    /// <summary>
+    /// While holding, the player aims (handled by the aim system) and can move.
+    /// Releasing G — or a fresh fire-click — commits the throw.
+    /// </summary>
+    private void HandleThrowing()
+    {
+        bool releasedG   = ThrowReleasedThisFrame();
+        bool clickThrow  = wantsToShoot && !wasHoldingFireLastFrame; // fresh click
+ 
+        if (releasedG || clickThrow)
+            animationsManager.TriggerThrow();
+    }
+ 
+    /// <summary>
+    /// Animation event (throw RELEASE frame) via PlayerAnimationsManager.
+    /// Reads the current cursor ground point and throws the grenade toward it.
+    /// </summary>
+    public void OnThrowRelease()
+    {
+        Vector3 target = GetAimGroundPoint();
+        equipmentManager.ThrowGrenade(target);
+    }
+ 
+    /// <summary>Animation event (throw clip end). Throw complete — return to Idle.</summary>
+    public void OnThrowAnimationEnd()
+    {
+        if (currentState == CombatState.Throwing)
+            SetState(CombatState.Idle);
+    }
+ 
+    // The cursor's point on the ground plane (y = 0), used as the throw target.
+    private Vector3 GetAimGroundPoint()
+    {
+        InputAction mousePosition = inputManager.GetMousePosition();
+        var (success, position) = Helpers.MousePositionToIsometric(
+            Camera.main, mousePosition, groundMask, 0f);
+ 
+        return success ? position : transform.position + transform.forward * 5f;
+    }
+ 
+    #endregion
+
 } 

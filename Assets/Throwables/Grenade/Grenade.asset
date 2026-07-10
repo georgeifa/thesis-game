@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 067bbc8cc651fdf41b840c86a05f6d82, type: 3}
+  m_Name: Grenade
+  m_EditorClassIdentifier: Assembly-CSharp::ThrowableScriptableObject
+  Name: Grenade
+  GrenadePrefab: {fileID: 970388684061182944, guid: 1a17a71b31d86d749ad97e7b07ef315f, type: 3}
+  ThrowableModel: {fileID: 1383632906025432633, guid: 610bf6e50defcae4eb38504db7250b5e, type: 3}
+  ExplosionVFX: {fileID: 11400000, guid: c8bfb98f4ee59cb488fe78f1bf0ad9fb, type: 2}
+  Damage: 120
+  BlastRadius: 4
+  ExplodeAfter: 2.5
+  TargetLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  MinArcHeight: 2.5
+  MaxArcHeight: 3.5

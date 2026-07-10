@@ -97,4 +97,29 @@ public static class Helpers
 
         return Radius + m_ColliderOffset;
     }
+
+    public static Vector3 CalculateArcVelocity(Vector3 start, Vector3 target, float minArcHeight, float maxArcHeight)
+    {
+        // Get horizontal direction and distance
+        Vector3 horizontalDirection = target - start;
+        horizontalDirection.y = 0;  // Remove height difference
+        float horizontalDistance = horizontalDirection.magnitude;
+        
+        // Normalize for direction
+        horizontalDirection.Normalize();
+        
+        // Calculate time based on distance (faster for longer throws)
+        float flightTime = Mathf.Sqrt(horizontalDistance) * 0.5f;
+        
+        // Calculate vertical and horizontal velocities
+        // Random arc height
+        float arcHeight = Random.Range(minArcHeight, maxArcHeight);
+        float verticalVelocity = (arcHeight + (target.y - start.y)) / flightTime + 0.5f * Mathf.Abs(Physics.gravity.y) * flightTime;
+        float horizontalVelocity = horizontalDistance / flightTime;
+        
+        // Combine into final velocity
+        Vector3 velocity = (horizontalDirection * horizontalVelocity) + (Vector3.up * verticalVelocity);
+        
+        return velocity;
+    }
 }

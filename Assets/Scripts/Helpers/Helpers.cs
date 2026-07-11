@@ -122,4 +122,20 @@ public static class Helpers
         
         return velocity;
     }
+
+    public static Vector3 CalculateArcVelocity(Vector3 start, Vector3 target, float minFlightTime, float maxFlightTime, float maxDistance)
+    {
+        Vector3 gravity = Physics.gravity;
+        Vector3 delta = target - start;
+
+        // How far is this throw, as a fraction of the max range (0 = on top of you, 1 = max).
+        Vector3 flat = new Vector3(delta.x, 0f, delta.z);
+        float distanceFraction = Mathf.Clamp01(flat.magnitude / maxDistance);
+
+        // Closer throws get a shorter flight time; far throws get the longer one.
+        float flightTime = Mathf.Lerp(minFlightTime, maxFlightTime, distanceFraction);
+
+        Vector3 velocity = (delta - 0.5f * gravity * flightTime * flightTime) / flightTime;
+        return velocity;
+    }
 }

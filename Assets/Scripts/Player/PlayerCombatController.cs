@@ -42,8 +42,6 @@ public class PlayerCombatController : MonoBehaviour
     private bool throwHeld;              // is G currently held (set each frame by input)
     private bool wasThrowHeldLastFrame;  // for edge detection
 
-    [SerializeField] private LayerMask groundMask;  
-
 #region Initializations
     private void Awake()
     {
@@ -415,26 +413,26 @@ public class PlayerCombatController : MonoBehaviour
     /// Reads the current cursor ground point and throws the grenade toward it.
     /// </summary>
     public void OnThrowRelease()
-    {
-        Vector3 target = GetAimGroundPoint();
-        equipmentManager.ThrowGrenade(target);
-    }
+{
+    if (!aimController.HasValidAimPoint) return;
+
+    Vector3 target = aimController.AimGroundPoint;
+
+    // Clamp the target to within max throw distance of the player.
+    Vector3 toTarget = target - transform.position;
+    toTarget.y = 0;
+    float maxDist = equipmentManager.GetMaxThrowDistance();
+    if (toTarget.magnitude > maxDist)
+        target = transform.position + toTarget.normalized * maxDist;
+
+    equipmentManager.ThrowGrenade(target);
+}
  
     /// <summary>Animation event (throw clip end). Throw complete — return to Idle.</summary>
     public void OnThrowAnimationEnd()
     {
         if (currentState == CombatState.Throwing)
             SetState(CombatState.Idle);
-    }
- 
-    // The cursor's point on the ground plane (y = 0), used as the throw target.
-    private Vector3 GetAimGroundPoint()
-    {
-        InputAction mousePosition = inputManager.GetMousePosition();
-        var (success, position) = Helpers.MousePositionToIsometric(
-            Camera.main, mousePosition, groundMask, 0f);
- 
-        return success ? position : transform.position + transform.forward * 5f;
     }
  
     #endregion

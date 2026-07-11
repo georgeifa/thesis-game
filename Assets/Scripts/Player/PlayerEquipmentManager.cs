@@ -58,6 +58,10 @@ public class PlayerEquipmentManager : MonoBehaviour
     public ThrowableScriptableObject EquippedGrenade;   // the throwable definition (like Primary/Secondary for guns)
     [SerializeField] private Transform throwPoint;    // empty on the hand — where grenades spawn
     [SerializeField] private int startingGrenades = 3;
+    [Header("Throw Settings")]
+    [SerializeField] private float MinFlightTime = 0.45f;   // close throws — snappy
+    [SerializeField] private float MaxFlightTime = 1.1f;    // far throws — arcs nicely
+    [SerializeField] private float MaxThrowDistance = 12f;
  
  
 // 2. ADD private state:
@@ -269,12 +273,16 @@ public class PlayerEquipmentManager : MonoBehaviour
         ConfigureGrenade(grenade);
  
         Vector3 velocity = Helpers.CalculateArcVelocity(
-            throwPoint.position, targetGroundPoint,
-            EquippedGrenade.MinArcHeight, EquippedGrenade.MaxArcHeight);
+            throwPoint.position, targetGroundPoint, MinFlightTime,MaxFlightTime,MaxThrowDistance);
  
         grenade.Launch(velocity);
  
         grenadeCount--;
+    }
+
+    public float GetMaxThrowDistance()
+    {
+        return MaxThrowDistance;
     }
  
     // Configures a pooled grenade from the equipped grenade's data.

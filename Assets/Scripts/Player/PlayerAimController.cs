@@ -35,6 +35,9 @@ public class PlayerAimController : MonoBehaviour
     public Rig HandIk;
     public Rig weaponHandIk;
 
+    public Vector3 AimGroundPoint { get; private set; }
+    public bool HasValidAimPoint { get; private set; }
+
 
     private void Start()
     {
@@ -60,12 +63,11 @@ public class PlayerAimController : MonoBehaviour
         if (aimingPressed)
         {
             float y = equipmentManager.ActiveGun.GetComponentInChildren<ParticleSystem>().transform.position.y;
-            var (success, position) = Helpers.MousePositionToIsometric(mainCamera, mousePosition, groundMask, y);
-
-            if (success)
+            if (UpdateAimGroundPoint(mousePosition,y))
             {
-                RotateTowards(position);           // ← the rotation part, extracted
-                aimingRig.weight = Mathf.MoveTowards(aimingRig.weight, 1, Time.deltaTime * aimDuration);  // gun-aim pose
+                RotateTowards(AimGroundPoint);
+                isAiming = true;
+                aimingRig.weight = Mathf.MoveTowards(aimingRig.weight, 1, Time.deltaTime * aimDuration);
             }
         }
         else if (!transform.forward.Equals(Vector3.forward))
@@ -78,20 +80,31 @@ public class PlayerAimController : MonoBehaviour
     // NEW — rotate toward the cursor WITHOUT the gun-aim rig/pose. For the throw.
     public void RotateTowardsCursor(InputAction mousePosition)
     {
-        var (success, position) = Helpers.MousePositionToIsometric(mainCamera, mousePosition, groundMask, 0f);
-        if (success)
-            RotateTowards(position);
+        if (UpdateAimGroundPoint(mousePosition,0f))
+            RotateTowards(AimGroundPoint);
     }
 
     // Shared rotation logic
     private void RotateTowards(Vector3 targetPoint)
     {
-        var direction = targetPoint - transform.position;
+        Vector3 direction = targetPoint - transform.position;
         direction.y = 0;
         if (direction.sqrMagnitude > 0.01f)
             transform.forward = Vector3.Slerp(transform.forward, direction, rotationTimeAim * Time.deltaTime);
         isAiming = true;
 
+    }
+
+    private bool UpdateAimGroundPoint(InputAction mousePosition, float aimHeight)
+    {
+        var (success, position) = Helpers.MousePositionToIsometric(
+            mainCamera, mousePosition, groundMask, aimHeight);
+ 
+        HasValidAimPoint = success;
+        if (success)
+            AimGroundPoint = position;
+ 
+        return success;
     }
 
     void HandleAnimations()

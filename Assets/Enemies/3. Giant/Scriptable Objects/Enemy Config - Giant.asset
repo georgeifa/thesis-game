@@ -24,6 +24,7 @@ MonoBehaviour:
   isMovingParam: IsMoving
   ResetParam: Reset
   HitDirectionParam: HitDirection
+  UnlockEnemySkillsAfter: 0
   NavMeshAgentConfig: {fileID: 11400000, guid: 04af49c823d214f49866b4b662b7461d, type: 2}
   FOVConfig: {fileID: 11400000, guid: c5ea97d65c548a5428919c415c8d0b43, type: 2}
   CombatConfig: {fileID: 11400000, guid: 3acb2e981f979844eb5c78a5418df1d4, type: 2}

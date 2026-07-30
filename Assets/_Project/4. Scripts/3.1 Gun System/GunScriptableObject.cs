@@ -17,7 +17,13 @@ public class GunScriptableObject : ScriptableObject
     // because the mesh pivot is not at the grip. Local to HandWeaponSocket.
     [Header("In-Hand Attach Pose")]
     public Vector3 HoldPositionOffset;
-    public Vector3 HoldRotationOffset; // Euler angles
+    public Vector3 HoldRotationOffset;
+
+    // How this weapon sits when stowed on its body socket. Calibrated per
+    // weapon because each mesh pivot differs. Local to the body socket.
+    [Header("Stowed (Body Socket) Pose")]
+    public Vector3 BodyPositionOffset;
+    public Vector3 BodyRotationOffset;
 
     public DamageConfigScriptableObject DamageConfig;
     public AmmoConfigScriptableObject AmmoConfig;

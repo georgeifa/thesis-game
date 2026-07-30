@@ -104,7 +104,9 @@ public class PlayerAnimationsManager : MonoBehaviour
     public void TriggerReload()
     {
         animator.ResetTrigger(CancelActionHash);
+        animator.SetInteger(SlotHash, (int)equipmentManager.CurrentSlot);
         animator.SetTrigger(ReloadHash);
+
     }
     /// <summary>
     /// Called by PlayerCombatController when a reload is interrupted.

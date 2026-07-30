@@ -3976,7 +3976,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Primary: {fileID: 11400000, guid: e10ffcf5cee60bb479a6e77fde82e617, type: 2}
-  Secondary: {fileID: 11400000, guid: e10ffcf5cee60bb479a6e77fde82e617, type: 2}
+  Secondary: {fileID: 11400000, guid: 4bc48f0a5554ae64f98cdb71d821a9df, type: 2}
   weaponParent: {fileID: 1905888955}
   backSocket: {fileID: 1100380825}
   waistSocket: {fileID: 2047915775}
@@ -4050,7 +4050,7 @@ MonoBehaviour:
   rightHandIK: {fileID: 1722831000}
   magHandSocket: {fileID: 1634784565}
   ikBlendSpeed: 100
-  layerBlendSpeed: 6
+  layerBlendSpeed: 3
   grenadeHandSocket: {fileID: 611762632}
 --- !u!1 &1904689160
 GameObject:
@@ -4107,7 +4107,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1905888954}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.000000007525993, y: 0.0000000016073043, z: -0.000000016858392, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

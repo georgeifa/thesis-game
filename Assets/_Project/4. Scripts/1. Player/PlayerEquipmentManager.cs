@@ -200,8 +200,8 @@ public class PlayerEquipmentManager : MonoBehaviour
         if (socket == null) return;
 
         gun.transform.SetParent(socket);
-        gun.transform.localPosition = Vector3.zero;
-        gun.transform.localRotation = Quaternion.identity;
+        gun.transform.localPosition = gun.gunData.BodyPositionOffset;
+        gun.transform.localRotation = Quaternion.Euler(gun.gunData.BodyRotationOffset);
     }
 
     /// <summary>Parks a gun under WeaponHolder at local zero (rig-controlled in-hand pose).</summary>

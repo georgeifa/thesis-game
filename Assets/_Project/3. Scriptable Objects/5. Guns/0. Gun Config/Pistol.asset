@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b182f9c312f35d4e9d99be0f62eb530, type: 3}
+  m_Name: Pistol
+  m_EditorClassIdentifier: 
+  ImpactType: {fileID: 11400000, guid: 1309607f79aad264d8b1a66dafdeaebd, type: 2}
+  Type: 0
+  Name: PIstol
+  GunPrefab: {fileID: 1191783070793217294, guid: d6fa1c27d9b4ad049bcf0ba9fc6634aa, type: 3}
+  DroppedMagPrefab: {fileID: 3129059570630837606, guid: 5134230eac631244e8306b093c0ce131, type: 3}
+  droppedMagLifetime: 3
+  SpawnPoint: {x: 0, y: 0, z: 0}
+  SpawnRotation: {x: 0, y: 0, z: 0}
+  HoldPositionOffset: {x: -0.0007, y: -0.2593, z: 0.0956}
+  HoldRotationOffset: {x: 271.38705, y: 103.147705, z: 0.0033863962}
+  BodyPositionOffset: {x: 0, y: 0, z: 0}
+  BodyRotationOffset: {x: 0, y: 0, z: 0}
+  DamageConfig: {fileID: 11400000, guid: 3506e31891f114244a3f21c1b3963b62, type: 2}
+  AmmoConfig: {fileID: 11400000, guid: 7b705adb584cb874d8ec48ca8d51cd00, type: 2}
+  ShootConfig: {fileID: 11400000, guid: bead133800530124aa5e0186a3b25ce1, type: 2}
+  TrailConfig: {fileID: 11400000, guid: 113d85b812fd1044d9c8747fd222e7f4, type: 2}
+  AudioConfig: {fileID: 11400000, guid: 026740e8e3a840842b06256cc0856807, type: 2}

@@ -18,9 +18,9 @@ MonoBehaviour:
   GunPrefab: {fileID: 1191783070793217294, guid: d6fa1c27d9b4ad049bcf0ba9fc6634aa, type: 3}
   DroppedMagPrefab: {fileID: 3129059570630837606, guid: 5134230eac631244e8306b093c0ce131, type: 3}
   droppedMagLifetime: 3
-  SpawnPoint: {x: 0, y: 0, z: 0}
+  SpawnPoint: {x: 0.094, y: 0.056, z: 0.345}
   SpawnRotation: {x: 0, y: 0, z: 0}
-  HoldPositionOffset: {x: -0.0007, y: -0.2593, z: 0.0956}
+  HoldPositionOffset: {x: -0.0011, y: 0.0946, z: 0.0285}
   HoldRotationOffset: {x: 271.38705, y: 103.147705, z: 0.0033863962}
   BodyPositionOffset: {x: 0, y: 0, z: 0}
   BodyRotationOffset: {x: 0, y: 0, z: 0}

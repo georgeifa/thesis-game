@@ -208,8 +208,9 @@ public class PlayerEquipmentManager : MonoBehaviour
     private void AttachGunToHolder(Gun gun)
     {
         gun.transform.SetParent(weaponParent);
-        gun.transform.localPosition = Vector3.zero;
+        gun.transform.localPosition = gun.gunData.SpawnPoint;
         gun.transform.localRotation = Quaternion.identity;
+        gun.ResetRecoil(); 
     }
 
     /// <summary>Switch-sequence call (stow blink): parks the slot's gun on its body socket.</summary>

@@ -308,6 +308,7 @@ public class Gun : MonoBehaviour
 
     public void ResetRecoil()
     {
+        targetPosition = transform.localPosition;
         applyRecoil = false;
         currentVelocity = Vector3.zero;
         // don't touch localPosition here — the caller sets it (hold offset / zero)

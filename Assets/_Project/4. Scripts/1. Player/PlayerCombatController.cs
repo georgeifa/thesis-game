@@ -208,6 +208,23 @@ public class PlayerCombatController : MonoBehaviour
         UnsubscribeGunEvents();
     }
 
+    /// <summary>
+    /// Forces the state machine back to Idle, clearing any action that was in
+    /// progress when the previous soldier died. Bypasses SetState because the
+    /// exit logic of the interrupted state should not run.
+    /// </summary>
+    public void ResetToIdle()
+    {
+        currentState = CombatState.Idle;
+ 
+        wantsToShoot  = false;
+        reloadPressed = false;
+        switchPressed = false;
+        throwHeld     = false;
+        wasThrowHeldLastFrame   = false;
+        wasHoldingFireLastFrame = true;   // require a fresh click after deploying
+    }
+
 #region Weapon Switching
 
     public void ToggleWeapon()

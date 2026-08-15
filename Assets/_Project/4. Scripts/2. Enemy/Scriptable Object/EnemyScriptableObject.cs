@@ -1,8 +1,6 @@
 using System;
 using MyBox;
 using Unity.Behavior;
-using UnityEditor;
-using UnityEditor.EditorTools;
 using UnityEngine;
 
 
@@ -49,6 +47,8 @@ public class EnemyScriptableObject : ScriptableObject
     {
         enemy.CurrentState = AIState.Idle;
         enemy.Health = Health;
+        enemy.ResetHealth();
+
         enemy.DeathSO = DeathSO;
 
         enemy.AI_Locomotion.walkSpeed = walkSpeed;

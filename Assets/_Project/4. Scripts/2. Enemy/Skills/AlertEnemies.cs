@@ -10,8 +10,6 @@ public class AlertEnemies : SkillsScriptableObject
     [Tooltip("Time between the start of the animation and the time the enemies start getting alerted")]
     public float ReactionTime = 1f;
 
-    private Collider[] Colliders = new Collider[50]; 
-
     public override void UseSkill(Enemy enemy, GameObject player)
     {
         base.UseSkill(enemy,player);
@@ -29,18 +27,17 @@ public class AlertEnemies : SkillsScriptableObject
 
         yield return new WaitForSeconds(ReactionTime);
 
+        Collider[] colliders = new Collider[50];
+ 
         int count = Physics.OverlapSphereNonAlloc(
-            enemy.transform.position, Range, Colliders, TargetLayer);
-        
-
+            enemy.transform.position, Range, colliders, TargetLayer);
+ 
         for (int i = 0; i < count; i++)
         {
-            var agent = Colliders[i].GetComponent<BehaviorGraphAgent>();
+            var agent = colliders[i].GetComponent<BehaviorGraphAgent>();
             if (agent != null)
-            {
                 agent.SetVariableValue("Alerted", true);
-            }
-
+ 
             yield return null;
         }
     }

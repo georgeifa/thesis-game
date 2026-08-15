@@ -44,38 +44,18 @@ public class TrailConfigurationScriptableObject : ScriptableObject
 
         trail.transform.position = endPoint;
 
-        if(hit.collider != null)
+        if (hit.collider != null)
         {
             SurfaceManager.Instance.HandleImpact(
-                hit.transform.gameObject,
-                endPoint,
-                hit.normal,
-                ImpactType,
-                0
-            );
+                hit.transform.gameObject, endPoint, hit.normal, ImpactType, 0);
 
-            if(hit.collider.CompareTag("Damagable")){
-                if(hit.collider.TryGetComponent(out IDamagable damagable))
-                {
-                    damagable.TakeDamage(DamageConfig.GetDamage(distance));
-                    damagable.GetHitDirection(hit.point);
-                }
-                else
-                {
-                    try{
-                        damagable = hit.collider.GetComponentInParent<IDamagable>();
-                        damagable.TakeDamage(DamageConfig.GetDamage(distance));
-                        damagable.GetHitDirection(hit.point);
-                    }
-                    catch(Exception e)
-                    {
-                        if(damagable == null)
-                            Debug.LogError($"No IDamageable found on: {hit.collider}");
-                        else
-                            Debug.Log(e.Message);
-
-                    }
-                }
+            // The interface is the test — no tag needed. GetComponentInParent walks up
+            // so hitboxes can live on child meshes.
+            IDamagable damagable = hit.collider.GetComponentInParent<IDamagable>();
+            if (damagable != null)
+            {
+                damagable.GetHitDirection(hit.point);
+                damagable.TakeDamage(DamageConfig.GetDamage(distance));
             }
         }
 

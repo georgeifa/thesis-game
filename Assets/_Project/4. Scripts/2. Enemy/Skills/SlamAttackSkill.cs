@@ -33,20 +33,20 @@ public class SlamAttackSkill : SkillsScriptableObject
             instance.transform.localScale = new Vector3(Range,Range,Range);
         }
 
-        Collider[] colliders = new Collider[4];
-
-        int numColliders = Physics.OverlapSphereNonAlloc(enemy.transform.position, Range,colliders,PlayerLayerMask);
-
-        if (numColliders > 0)
+        Collider[] colliders = new Collider[8];
+        int numColliders = Physics.OverlapSphereNonAlloc(
+            enemy.transform.position, Range, colliders, PlayerLayerMask);
+ 
+        var alreadyHit = new System.Collections.Generic.HashSet<IDamagable>();
+ 
+        for (int i = 0; i < numColliders; i++)
         {
-            player.GetComponent<IDamagable>().TakeDamage(Damage);
+            IDamagable target = colliders[i].GetComponentInParent<IDamagable>();
+            if (target == null || !alreadyHit.Add(target)) continue;
+ 
+            target.GetHitDirection(enemy.transform.position);
+            target.TakeDamage(Damage);
         }
-
-        while(enemy.AI_Combat.isUsingSkill)
-            yield return null;
-
-        pool.ResetParent(instance);
-        instance.gameObject.SetActive(false);
 
     }
 }

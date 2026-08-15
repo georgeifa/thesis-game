@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 95752a91718e8be42b99907d9815a9b2
 ModelImporter:
-  serializedVersion: 22200
+  serializedVersion: 24200
   internalIDToNameTable: []
   externalObjects: {}
   materials:
@@ -55,22 +55,15 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.2377049
-        functionName: EnableCollider
-        data: 
-        objectReferenceParameter: {fileID: 11500000, guid: 377d7e7674da00b43a7b193f3d3c1429, type: 3}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.57103825
-        functionName: DisableCollider
-        data: 
-        objectReferenceParameter: {fileID: 11500000, guid: 377d7e7674da00b43a7b193f3d3c1429, type: 3}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
       - time: 0.8579235
         functionName: OnAttackComplete
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 377d7e7674da00b43a7b193f3d3c1429, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.2865497
+        functionName: MeleeStrike
         data: 
         objectReferenceParameter: {fileID: 11500000, guid: 377d7e7674da00b43a7b193f3d3c1429, type: 3}
         floatParameter: 0
@@ -106,6 +99,9 @@ ModelImporter:
     maxBonesPerVertex: 4
     minBoneWeight: 0.001
     optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
     meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8

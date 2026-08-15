@@ -32,6 +32,13 @@ public class ShootConfigurationScriptableObject : ScriptableObject
     public float damping = 0.7f;
 
     [Space]
+    [Header("Bullet Settings")]
+    [Tooltip("Bullet thickness. Larger = more forgiving, easier to hit small enemies.")]
+    public float BulletRadius = 0.15f;
+    [Tooltip("Max shot distance. SphereCast with float.MaxValue has precision problems.")]
+    public float MaxRange = 200f;
+
+    [Space]
     [Header("Firing Settings")]
     public FireMode FireMode;
     [ConditionalField(nameof(FireMode), false, FireMode.Shotgun)] public int PelletCount = 8;

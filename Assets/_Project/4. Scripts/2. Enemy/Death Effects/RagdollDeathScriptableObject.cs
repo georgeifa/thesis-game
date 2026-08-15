@@ -95,7 +95,7 @@ public class RagdollDeathScriptableObject : DeathScriptableObject
         legsAnimator.enabled = true;
         animator.enabled = true;
         foreach(MeshCollider col in meshColliders) col.enabled = true;
-        AI_Locomotion.Reset();
+        AI_Locomotion.ResetLocomotion();
         behaviorGraphAgent.enabled = true;
 
 

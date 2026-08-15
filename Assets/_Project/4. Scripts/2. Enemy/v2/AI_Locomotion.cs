@@ -40,7 +40,6 @@ public class AI_Locomotion : MonoBehaviour
     
     void Update()
     {
-        int a = Random.Range(1,3);
         if (useRootMotion) return;
         
         if (agent.desiredVelocity.magnitude > 0.1f && !agent.isStopped)
@@ -60,6 +59,9 @@ public class AI_Locomotion : MonoBehaviour
     
     void UpdateMovement()
     {
+
+        agent.speed = GetCurrentMaxSpeed();
+
         // Calculate turn angle
         float turnAngle = Vector3.Angle(transform.forward, agent.desiredVelocity.normalized);
         
@@ -119,7 +121,7 @@ public class AI_Locomotion : MonoBehaviour
     
     public void Resume() => agent.isStopped = false;
 
-    public void Reset() {ResetPath(); Resume(); } 
+    public void ResetLocomotion() { ResetPath(); Resume(); }
 
     public void ResetPath() => agent.ResetPath();
     

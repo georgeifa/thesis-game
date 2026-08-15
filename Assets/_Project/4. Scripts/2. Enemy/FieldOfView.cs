@@ -47,7 +47,7 @@ public class FieldOfView : MonoBehaviour
             else
                 Angle = this.DetectionAngle;
             
-            bool result = PerformFOVCheck(transform, radius, targetMask, Angle);
+            bool result = PerformFOVCheck != null && PerformFOVCheck(transform, radius, targetMask, Angle);
             onComplete?.Invoke(result);
         }
     }

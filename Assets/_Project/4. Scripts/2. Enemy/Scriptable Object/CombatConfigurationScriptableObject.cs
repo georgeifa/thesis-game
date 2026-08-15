@@ -1,12 +1,5 @@
-using System;
-using System.Collections;
-using FIMSpace.FProceduralAnimation;
 using MyBox;
-using Unity.Behavior;
-using Unity.VisualScripting;
-using UnityEditor.EditorTools;
 using UnityEngine;
-using UnityEngine.AI;
 
 [CreateAssetMenu(fileName = "Combat Config", menuName = "Enemy/Combat Config")]
 public class CombatConfigurationScriptableObject : ScriptableObject

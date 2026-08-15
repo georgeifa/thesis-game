@@ -1,10 +1,7 @@
-using System.Data;
-using JetBrains.Annotations;
 using MyBox;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.InputSystem.UI;
 
 [BlackboardEnum]
 public enum AIState
@@ -21,7 +18,15 @@ public enum AIState
 public class Enemy : PoolableObject, IDamagable
 {
     public AIState CurrentState;
+    [Tooltip("Maximum health. Set from the Enemy Config.")]
     public int Health = 100;
+ 
+    [SerializeField]
+    private int currentHealth;
+ 
+    public int CurrentHealth => currentHealth;
+    public int MaxHealth => Health;
+
     [Space]
     [SerializeField]
     private Transform root;
@@ -55,15 +60,15 @@ public class Enemy : PoolableObject, IDamagable
     private ParticleSystem deathParticle;
     public DeathScriptableObject DeathSO;
 
-    public int CurrentHealth { get => Health; private set => Health = value; }
-    public int MaxHealth { get => Health; private set => Health = value; }
-
-
+    /// <summary>Full health, alive. Called on spawn and when config is applied.</summary>
+    public void ResetHealth() => currentHealth = Health;
 
     void OnEnable()
     {
         OnDeath += Die;
         Animator.SetTrigger(ResetParam);
+        ResetHealth();
+
     }
 
     void Awake()
@@ -88,22 +93,16 @@ public class Enemy : PoolableObject, IDamagable
 
     public void TakeDamage(int Damage)
     {
-        int damageTaken = Mathf.Clamp(Damage, 0, CurrentHealth);
-
-        CurrentHealth -= damageTaken;
-
-        if (damageTaken != 0)
-        {
-            OnTakeDamage?.Invoke(damageTaken);
-        }
-        
-        if(CurrentHealth == 0 && damageTaken != 0)
-        {
+        int damageTaken = Mathf.Clamp(Damage, 0, currentHealth);
+        if (damageTaken == 0) return;
+ 
+        currentHealth -= damageTaken;
+        OnTakeDamage?.Invoke(damageTaken);
+ 
+        if (currentHealth <= 0)
             OnDeath?.Invoke();
-        }
-
-        Animator.SetInteger(HitDirectionParam,0);
-
+ 
+        Animator.SetInteger(HitDirectionParam, 0);
     }
 
     public void GetHitDirection(Vector3 hitPoint)
@@ -139,7 +138,7 @@ public class Enemy : PoolableObject, IDamagable
     {
         AI_Locomotion.Stop();
 
-        Health = 0;
+        currentHealth = 0;
         DeathSO.Die(this,root, deathParticle);
     }
 

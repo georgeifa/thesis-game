@@ -13,6 +13,8 @@ public class FOVConfigScriptableObject : ScriptableObject
     public LayerMask targetMask;
     public LayerMask obstructionMask;
 
+    private readonly Collider[] rangeChecks = new Collider[10];
+
     public void Setup_FOVConfig(Enemy enemy, GameObject player)
     {
         enemy.FOV.interval = interval;
@@ -31,7 +33,6 @@ public class FOVConfigScriptableObject : ScriptableObject
 
     private bool FieldOfViewCheck(Transform Transform, float Radius, LayerMask TargetMask, float Angle)
     {
-        Collider[] rangeChecks = new Collider[10];
         float n_Radius = Helpers.RangeWithColliderOffset(Transform.gameObject, Radius);
         int numColliders = Physics.OverlapSphereNonAlloc(Transform.position, n_Radius, rangeChecks, TargetMask);
         

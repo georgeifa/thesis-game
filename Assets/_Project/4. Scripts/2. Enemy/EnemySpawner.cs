@@ -1,10 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
-using System.Security.Cryptography;
-using Unity.Behavior;
-using Unity.VisualScripting;
-using UnityEditor.Analytics;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -16,6 +11,11 @@ public class EnemySpawner : MonoBehaviour
     public List<EnemyScriptableObject> Enemies = new List<EnemyScriptableObject>();
     private NavMeshTriangulation triangulation;
     private Dictionary<int,ObjectPool> EnemyObjectPools = new Dictionary<int, ObjectPool>();
+
+    [Header("Debug")]
+    [SerializeField] private bool enableRespawnEnemies = true;
+    [SerializeField] private KeyCode RespawnEnemiesKey = KeyCode.F1;
+
 
     void Awake()
     {
@@ -29,6 +29,12 @@ public class EnemySpawner : MonoBehaviour
     {
         triangulation  = NavMesh.CalculateTriangulation();
         StartCoroutine(SpawnEnemies());
+    }
+
+    void Update()
+    {
+        if (enableRespawnEnemies && Input.GetKeyDown(RespawnEnemiesKey))
+            StartCoroutine(SpawnEnemies());
     }
 
     private IEnumerator SpawnEnemies()
@@ -63,10 +69,7 @@ public class EnemySpawner : MonoBehaviour
             if(NavMesh.SamplePosition(triangulation.vertices[VertexIndex],out hit, 2f, 1))
             {
                 enemy.Agent.Warp(hit.position);
-
-                enemy.behavior.SetVariableValue("Target",Player.gameObject);
                 enemy.Agent.enabled = true;
-                enemy.behavior.SetVariableValue("Current State",State.Idle);
             }
             else
             {

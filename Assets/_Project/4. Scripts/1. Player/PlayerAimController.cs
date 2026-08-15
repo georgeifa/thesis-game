@@ -77,6 +77,17 @@ public class PlayerAimController : MonoBehaviour
         }
     }
 
+    /// <summary>Clears aim state so a new soldier doesn't inherit the old one's.</summary>
+    public void ResetAim()
+    {
+        isAiming = false;
+        currentAimWeight = 0f;
+        aimingRig.weight = 0f;
+
+        animator.SetLayerWeight(aimingLayerIndexLower, 0f);
+        animator.SetLayerWeight(aimingLayerIndexUpper, 0f);
+    }
+
     // NEW — rotate toward the cursor WITHOUT the gun-aim rig/pose. For the throw.
     public void RotateTowardsCursor(InputAction mousePosition)
     {

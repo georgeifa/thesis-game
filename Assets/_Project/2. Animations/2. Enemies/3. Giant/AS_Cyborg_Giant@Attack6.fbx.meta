@@ -8,7 +8,7 @@ AssetOrigin:
   assetPath: Assets/Cyborg Giant/Animations/AS_Cyborg_Giant@Attack6.fbx
   uploadId: 768000
 ModelImporter:
-  serializedVersion: 22200
+  serializedVersion: 24200
   internalIDToNameTable: []
   externalObjects: {}
   materials:
@@ -69,6 +69,13 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
+      - time: 0.52631575
+        functionName: MeleeStrike
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 377d7e7674da00b43a7b193f3d3c1429, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}
@@ -99,6 +106,9 @@ ModelImporter:
     maxBonesPerVertex: 4
     minBoneWeight: 0.001
     optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
     meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8

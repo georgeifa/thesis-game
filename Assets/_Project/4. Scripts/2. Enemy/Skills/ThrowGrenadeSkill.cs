@@ -43,16 +43,12 @@ public class ThrowGrenadeSkill : SkillsScriptableObject
                 // Create grenade
         SetupGrenade(grenade);
 
-        Rigidbody rb = grenade.GetComponent<Rigidbody>();
-        
-        // Calculate velocity for arc
-        Vector3 velocity = Helpers.CalculateArcVelocity(throwPoint, player.transform.position,minArcHeight,maxArcHeight);
-        
-        // Apply velocity
-        rb.linearVelocity = velocity;
-        
-        // Add some spin (optional)
-        rb.angularVelocity = new Vector3(Random.Range(1f, 7f), 0, 0);
+        Vector3 velocity = Helpers.CalculateArcVelocity(
+            throwPoint, player.transform.position, minArcHeight, maxArcHeight);
+ 
+        // Launch() also clears hasFuseStarted — a pooled grenade would
+        // otherwise detonate on its first frame after reuse.
+        grenade.GetComponent<Grenade>().Launch(velocity);
     }
 
     private void SetupGrenade(PoolableObject grenadeOBJ)

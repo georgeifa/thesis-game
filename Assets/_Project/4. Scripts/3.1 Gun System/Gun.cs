@@ -209,11 +209,12 @@ public class Gun : MonoBehaviour
         CurrentClipAmmo--;
         OnAmmoChanged?.Invoke(CurrentClipAmmo, CurrentAmmo);
 
-        if (Physics.Raycast(
+        if (Physics.SphereCast(
             ShootSystem.transform.position,
-            shootDirection,
+            gunData.ShootConfig.BulletRadius,
+            shootDirection.normalized,
             out RaycastHit hit,
-            float.MaxValue,
+            gunData.ShootConfig.MaxRange,
             gunData.ShootConfig.HitMask
         ))
         {
@@ -247,11 +248,12 @@ public class Gun : MonoBehaviour
 
 
 
-            if (Physics.Raycast(
+            if (Physics.SphereCast(
                 ShootSystem.transform.position,
-                shootDirection,
+                gunData.ShootConfig.BulletRadius,
+                shootDirection.normalized,
                 out RaycastHit hit,
-                float.MaxValue,
+                gunData.ShootConfig.MaxRange,
                 gunData.ShootConfig.HitMask
             ))
             {

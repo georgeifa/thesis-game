@@ -68,7 +68,8 @@ namespace FIMSpace.FTools
                 Quaternion referenceRotation = parent.transform.rotation;
 
                 // Target position for elastic bones
-                Vector3 targetPos = parent.ProceduralPosition + referenceRotation * transform.localPosition;
+                Vector3 targetPos = parent.ProceduralPosition + parent.transform.TransformDirection( transform.localPosition );
+                //Vector3 targetPos = parent.ProceduralPosition + referenceRotation * transform.localPosition;
                 PositionMuscle.Update(delta, targetPos);
 
                 ProceduralPosition = PositionMuscle.ProceduralPosition;
@@ -117,11 +118,6 @@ namespace FIMSpace.FTools
         public Vector3 BlendVector(Vector3 target, float blend)
         {
             return Vector3.LerpUnclamped(sourceAnimationPosition, target, blend);
-        }
-
-        public Quaternion GetTargetRotation()
-        {
-            return GetTargetRotation(elChild.ProceduralPosition, transform.TransformDirection(elChild.transform.localPosition), ProceduralPosition);
         }
 
         public Quaternion GetTargetRotation(Vector3 lookPos, Vector3 localOffset, float blending)

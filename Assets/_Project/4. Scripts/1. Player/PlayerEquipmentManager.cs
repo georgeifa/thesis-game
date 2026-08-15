@@ -119,6 +119,26 @@ public class PlayerEquipmentManager : MonoBehaviour
         equippedGuns[slot] = gun;
     }
 
+    /// <summary>
+    /// Restores the starting loadout: every weapon refilled, grenades restocked,
+    /// guns parked on their body sockets with the primary in hand.
+    /// </summary>
+    public void ResetLoadout()
+    {
+ 
+        foreach (var kvp in equippedGuns)
+        {
+            kvp.Value.InitializeAmmo();
+            ParkOnBodySocket(kvp.Key);
+        }
+ 
+        grenadeCount = startingGrenades;
+ 
+        // Force the swap to run even though currentSlot may already be Primary.
+        currentSlot = EquipmentSlot.None;
+        MakeActiveAndHold(EquipmentSlot.Primary);
+    }
+
     // ─────────────────────────────────────────────
     //  Switching
     // ─────────────────────────────────────────────

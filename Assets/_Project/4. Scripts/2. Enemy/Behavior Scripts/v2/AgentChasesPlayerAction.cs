@@ -21,8 +21,7 @@ public partial class AgentChasesPlayerAction : Action
 
     [SerializeReference] public BlackboardVariable<SkillsScriptableObject> SeparateSkill;
 
-    private AI_Locomotion AI_Locomotion;
-    private AI_Combat AI_Combat;
+    private Enemy enemy;
     private float StoppingDistance;
     private float timer = 0f;
 
@@ -30,9 +29,8 @@ public partial class AgentChasesPlayerAction : Action
     protected override Status OnStart()
     {
         if(Agent == null || Player == null) return Status.Failure;
-        
-        AI_Locomotion = Agent.Value.GetComponent<AI_Locomotion>();
-        AI_Combat = Agent.Value.GetComponent<AI_Combat>();
+        enemy = Agent.Value.GetComponent<Enemy>();
+        if(enemy == null) return Status.Failure;
 
 
         StoppingDistance = Agent.Value.GetComponent<NavMeshAgent>().stoppingDistance;
@@ -40,17 +38,21 @@ public partial class AgentChasesPlayerAction : Action
     }
 
     protected override Status OnUpdate()
-    {        
+    {  
+        // The state may have moved on (lost sight → Investigate) while this node was
+        // Running. A Running node parks the branch, so it has to bail out itself.
+        if (enemy.CurrentState != AIState.Chase) return Status.Failure;
+
         if (FollowPlayer)
         {
-            if(AI_Combat.EnemyIn)
+            if(enemy.AI_Combat.EnemyIn)
                 return Status.Success;
 
-            for(int i=0; i<AI_Combat.EnemyInSkill.Count;i++)
+            for(int i=0; i<enemy.AI_Combat.EnemyInSkill.Count;i++)
             {
-                if(AI_Combat.EnemyInSkill[i]){
-                    SkillsScriptableObject skill = AI_Combat.GetSeparateSkill(i);
-                    if(AI_Combat.CanUseSkill(skill,Player)){
+                if(enemy.AI_Combat.EnemyInSkill[i]){
+                    SkillsScriptableObject skill = enemy.AI_Combat.GetSeparateSkill(i);
+                    if(enemy.AI_Combat.CanUseSkill(skill,Player)){
                         SeparateSkill.Value = skill;
                         return Status.Success;
                     }
@@ -76,7 +78,7 @@ public partial class AgentChasesPlayerAction : Action
     void UpdateDestination()
     {
 
-        AI_Locomotion.SetDestination(Player.Value.transform.position);
+        enemy.AI_Locomotion.SetDestination(Player.Value.transform.position);
             
         // Draw debug line
         Debug.DrawLine(
@@ -101,7 +103,7 @@ public partial class AgentChasesPlayerAction : Action
 
     protected override void OnEnd()
     {
-        AI_Locomotion.ResetPath();
+        enemy.AI_Locomotion.ResetPath();
     }
 }
 

@@ -2104,7 +2104,7 @@ MonoBehaviour:
   NumberOfEnemiesToSpawn: 1
   SpawnDelay: 1
   Enemies:
-  - {fileID: 11400000, guid: 7f7205c02d3e72845a49c9a1e7eb3f56, type: 2}
+  - {fileID: 11400000, guid: 028a1b6598fccb7469b40de4d9e04994, type: 2}
   enableRespawnEnemies: 1
   RespawnEnemiesKey: 282
 --- !u!1 &942785660

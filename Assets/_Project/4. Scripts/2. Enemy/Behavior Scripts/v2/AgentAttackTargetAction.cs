@@ -32,6 +32,8 @@ public partial class AgentAttackTargetAction : Action
 
     protected override void OnEnd()
     {
+        if (AI_Combat != null && AI_Combat.isAttacking)
+            AI_Combat.OnAttackComplete();
     }
 }
 

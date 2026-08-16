@@ -87,6 +87,5 @@ public class EnemyScriptableObject : ScriptableObject
         enemy.behavior.SetVariableValue("AI Combat",enemy.AI_Combat);
         enemy.behavior.SetVariableValue("Enemy",enemy);
         enemy.behavior.SetVariableValue("Follow Player",true);
-
     }
 }

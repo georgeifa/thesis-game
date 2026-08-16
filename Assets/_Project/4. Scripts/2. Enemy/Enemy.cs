@@ -10,7 +10,9 @@ public enum AIState
     Patrol,
     Chase,
     Attack,
-    UsingSkill
+    UsingSkill,
+    Investigate,
+    LookAround
 }
 
 [DisallowMultipleComponent]

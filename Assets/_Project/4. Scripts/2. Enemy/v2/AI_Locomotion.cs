@@ -16,7 +16,7 @@ public class AI_Locomotion : MonoBehaviour
     [Header("Animation Parameters")]
     public string speedParam = "Speed";
     public string isMovingParam = "IsMoving";
-    public string LookingAroundParam = "LookingAround";
+    public string LookingAroundParam = "LookingAroundParam";
 
 
     
@@ -95,6 +95,7 @@ public class AI_Locomotion : MonoBehaviour
     
     void OnAnimatorMove()
     {
+
         if (animator.applyRootMotion)
         {
             transform.position += animator.deltaPosition;
@@ -151,5 +152,6 @@ public class AI_Locomotion : MonoBehaviour
     public void FinishLookingAround()
     {
         animator.SetInteger(LookingAroundParam,0);
+        SetRootMotionMode(false);
     }
 }

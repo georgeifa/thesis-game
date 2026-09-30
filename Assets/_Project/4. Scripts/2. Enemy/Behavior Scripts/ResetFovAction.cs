@@ -13,7 +13,6 @@ public partial class ResetFovAction : Action
     protected override Status OnStart()
     {
         if(FOV == null) return Status.Failure;
-        FOV.Value.ResetFOVAngle();
         return Status.Success;
     }
 }

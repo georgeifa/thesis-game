@@ -191,11 +191,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ExplodeAfter: 0
   Damage: 0
+  StaggerForce: 35
   BlastRadius: 0
   BlastVFX: {fileID: 0}
   TargetLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   blinkLight: {fileID: 542753438719553468}
   maxBlinkInterval: 0.4
   minBlinkInterval: 0.04

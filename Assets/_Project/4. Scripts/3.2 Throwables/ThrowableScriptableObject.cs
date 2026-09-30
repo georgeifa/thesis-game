@@ -12,6 +12,8 @@ public class ThrowableScriptableObject : ScriptableObject
 
     [Header("Explosion")]
     public int   Damage       = 120;
+    public float StaggerForce = 35f;
+
     public float BlastRadius   = 4f;
     public float ExplodeAfter  = 2.5f;
     public LayerMask TargetLayer;

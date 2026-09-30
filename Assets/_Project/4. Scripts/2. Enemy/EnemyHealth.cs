@@ -40,4 +40,9 @@ public class EnemyHealth : MonoBehaviour, IDamagable
     {
         throw new System.NotImplementedException();
     }
+
+    public void TakeDamage(int damage, Vector3 sourcePosition, float staggerForce = 0)
+    {
+        throw new System.NotImplementedException();
+    }
 }

@@ -44,6 +44,10 @@ public class ShootConfigurationScriptableObject : ScriptableObject
     [ConditionalField(nameof(FireMode), false, FireMode.Shotgun)] public int PelletCount = 8;
     public float FireRate = 600f;
 
+    [Space]
+    [Tooltip("Disruption dealt per shot, independent of damage.")]
+    public float StaggerForce = 8f;
+
     public Vector3 GetSpread(float ShootTime = 0)
     {
         Vector3 spread = Vector3.Lerp(

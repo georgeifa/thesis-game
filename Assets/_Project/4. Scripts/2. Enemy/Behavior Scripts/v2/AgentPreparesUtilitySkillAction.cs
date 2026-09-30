@@ -13,7 +13,7 @@ public partial class AgentPreparesUtilitySkillAction : Action
 
     protected override Status OnStart()
     {
-        if(Enemy == null || UtilitySkill == null) return Status.Failure;
+        if(Enemy?.Value == null || UtilitySkill?.Value == null) return Status.Failure;
 
         UtilitySkill.Value = Enemy.Value.UtilitySkill;
         return Status.Success;

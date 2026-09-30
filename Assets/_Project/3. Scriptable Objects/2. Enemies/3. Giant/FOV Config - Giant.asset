@@ -13,11 +13,13 @@ MonoBehaviour:
   m_Name: FOV Config - Giant
   m_EditorClassIdentifier: 
   interval: 0.1
-  radius: 10
-  DetectionAngle: 120
+  PatrolRadius: 5
+  PatrolDetectionAngle: 120
+  AlertedRadius: 25
+  AlertedDetectionAngle: 200
   targetMask:
     serializedVersion: 2
     m_Bits: 128
   obstructionMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 1024

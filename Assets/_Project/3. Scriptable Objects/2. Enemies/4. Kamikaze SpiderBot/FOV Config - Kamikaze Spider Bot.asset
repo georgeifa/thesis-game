@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca36a89cdc64a6543884488d9e9c9b65, type: 3}
   m_Name: FOV Config - Kamikaze Spider Bot
   m_EditorClassIdentifier: 
-  radius: 8
-  DetectionAngle: 120
-  AttackAngle: 90
+  interval: 0.1
+  PatrolRadius: 5
+  PatrolDetectionAngle: 120
+  AlertedRadius: 25
+  AlertedDetectionAngle: 200
   targetMask:
     serializedVersion: 2
     m_Bits: 128
   obstructionMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 1024

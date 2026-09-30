@@ -1,7 +1,14 @@
 fileFormatVersion: 2
-guid: 97247dcb182166540847a47b0a5119ef
+guid: 690437151ea3d71418a2a4fd1d87f1e2
+AssetOrigin:
+  serializedVersion: 1
+  productId: 322508
+  packageName: Cyborg Mutant3
+  packageVersion: 1.0
+  assetPath: Assets/Cyborg Mutant3/Animations/AS_Cyborg_Mutant3@GetHit_F2.fbx
+  uploadId: 761946
 ModelImporter:
-  serializedVersion: 22200
+  serializedVersion: 24200
   internalIDToNameTable: []
   externalObjects: {}
   materials:
@@ -31,11 +38,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: GetHit_B2
+      name: GetHit_F2
       takeName: Take 001
       internalID: 1827226128182048838
       firstFrame: 0
-      lastFrame: 57
+      lastFrame: 60
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -52,19 +59,19 @@ ModelImporter:
       keepOriginalPositionXZ: 0
       heightFromFeet: 0
       mirror: 0
-      bodyMask: 00000000010000000100000000000000000000000100000001000000010000000100000000000000000000000100000001000000
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.99658704
-        functionName: OnHitComplete
+      - time: 0.841083
+        functionName: EndStagger
         data: 
-        objectReferenceParameter: {fileID: 11500000, guid: 6b49ed9f53a3f9b458fc71d0e2d9b38f, type: 3}
+        objectReferenceParameter: {fileID: 11500000, guid: 6733640eefe67e941957aeb043703a7c, type: 3}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
       transformMask: []
       maskType: 3
-      maskSource: {fileID: 31900000, guid: 18448508a4987ad4397c08987a2eccd0, type: 2}
+      maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     isReadable: 0
   meshes:
@@ -92,6 +99,9 @@ ModelImporter:
     maxBonesPerVertex: 4
     minBoneWeight: 0.001
     optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
     meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
@@ -129,7 +139,7 @@ ModelImporter:
     hasTranslationDoF: 0
     hasExtraRoot: 0
     skeletonHasParents: 1
-  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: 95327cd4df2f47d478258b31e2fc1f5f, type: 3}
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: c110a94075d044543bdf731fec9e6a2b, type: 3}
   autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1

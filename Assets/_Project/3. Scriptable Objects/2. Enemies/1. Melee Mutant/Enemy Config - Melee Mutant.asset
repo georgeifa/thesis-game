@@ -15,14 +15,22 @@ MonoBehaviour:
   Prefab: {fileID: 7476447826649496181, guid: 91844b8ba8caf3340b02ec9e75c87086, type: 3}
   Health: 100
   walkSpeed: 2
-  runSpeed: 3.5
   chaseSpeed: 6
   rotationSpeed: 540
   turnSlowFactor: 0.5
   maxTurnAngle: 45
+  StaggerThreshold: 20
+  degreesPerForce: 8
+  maxAngle: 45
+  directionJitter: 25
+  duration: 0.7
   UtilitySkill: {fileID: 11400000, guid: e5c2730e934109948bb052a0108fa56b, type: 2}
   speedParam: Speed
   isMovingParam: IsMoving
+  ResetParam: Reset
+  HitDirectionParam: HitDirection
+  LookingAroundParam: LookingAroundParam
+  UnlockEnemySkillsAfter: 0
   NavMeshAgentConfig: {fileID: 11400000, guid: 8f0a5e0877aa75b46b4d47a18f5b4dcc, type: 2}
   FOVConfig: {fileID: 11400000, guid: 7ac9e8be21e05d348911234a1cbd92c0, type: 2}
   CombatConfig: {fileID: 11400000, guid: 8350e4a8891f8ec43af2a0909dce90b2, type: 2}

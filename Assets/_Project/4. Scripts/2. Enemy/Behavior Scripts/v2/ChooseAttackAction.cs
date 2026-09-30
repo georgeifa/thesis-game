@@ -11,7 +11,7 @@ using System.Linq;
 public partial class ChooseAttackAction : Action
 {
 
-    [SerializeReference] public BlackboardVariable<AI_Combat> AI_Combat;
+    [SerializeReference] public BlackboardVariable<Enemy> Enemy;
     [SerializeReference] public BlackboardVariable<GameObject> Player;
     [SerializeReference] public BlackboardVariable<SkillsScriptableObject> SkillToUse;
 
@@ -24,18 +24,22 @@ public partial class ChooseAttackAction : Action
 
 
     Dictionary<SkillsScriptableObject,int> availableSkills_w_Priorities;
+
+    AI_Combat ai_Combat;
     
     protected override Status OnStart()
     {
-        if(AI_Combat == null) return Status.Failure;
+        if(Enemy?.Value == null) return Status.Failure;
+
+        ai_Combat = Enemy.Value.AI_Combat;
 
         if(SkillToUse.Value != null)
             return Status.Success;
 
         availableSkills_w_Priorities = new Dictionary<SkillsScriptableObject, int>();
-        foreach(SkillsScriptableObject s in AI_Combat.Value.Skills)
+        foreach(SkillsScriptableObject s in ai_Combat.Skills)
         {
-            if(AI_Combat.Value.CanUseSkill(s,Player))
+            if(ai_Combat.CanUseSkill(s,Player))
                 availableSkills_w_Priorities.Add(s,s.Priority);
         }
 
@@ -44,6 +48,13 @@ public partial class ChooseAttackAction : Action
 
         return Status.Success;
 
+    }
+
+    protected override Status OnUpdate()
+    {
+        if (Enemy.Value.CurrentState != AIState.Chase) return Status.Failure;
+
+        return Status.Running;
     }
 
     private void CheckPriorities()
@@ -65,5 +76,7 @@ public partial class ChooseAttackAction : Action
             }
         }
     }
+
+    
 }
 

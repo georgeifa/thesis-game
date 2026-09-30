@@ -6,9 +6,16 @@ public class FOVConfigScriptableObject : ScriptableObject
 {
     public float interval = 0.1f;
 
-    public float radius;
-    [Range(0,360)]
-    public int DetectionAngle;
+    [Header("Patrol / idle")]
+    public float PatrolRadius;
+    [Range(0, 360)] public int PatrolDetectionAngle;
+
+    [Header("Alerted (chase / investigate)")]
+    [Tooltip("Longer than the patrol radius, so breaking contact needs real distance.")]
+    public float AlertedRadius = 25f;
+    [Tooltip("Wider than the patrol cone so running wide doesn't break contact. 360 means the enemy can never lose you by movement alone — 180-220 usually plays better.")]
+    [Range(0, 360)] public int AlertedDetectionAngle = 200;
+
 
     public LayerMask targetMask;
     public LayerMask obstructionMask;
@@ -18,20 +25,22 @@ public class FOVConfigScriptableObject : ScriptableObject
     public void Setup_FOVConfig(Enemy enemy, GameObject player)
     {
         enemy.FOV.interval = interval;
-        enemy.FOV.radius = radius;
-        enemy.FOV.DetectionAngle = DetectionAngle;
+        enemy.FOV.SetPatrolRadius_Angle(PatrolRadius,PatrolDetectionAngle);
+        enemy.FOV.SetAlertedRadius_Angle(AlertedRadius,AlertedDetectionAngle);
 
         enemy.FOV.targetMask = targetMask;
         enemy.FOV.obstructionMask = obstructionMask;
         enemy.FOV.playerRef = player;
 
-        enemy.FOV.PerformFOVCheck += FieldOfViewCheck;
-        enemy.FOV.ResetAngle += ResetFOVAngle;
-        enemy.FOV.MaxAngle += MaximizeFOVAngle;
+        enemy.FOV.SetPatrolFOV();
+        enemy.FOV.PerformFOVCheck = FieldOfViewCheck;
 
+        enemy.FOV.Restart();    
+
+        
     }
 
-    private bool FieldOfViewCheck(Transform Transform, float Radius, LayerMask TargetMask, float Angle)
+    private bool FieldOfViewCheck(Transform Transform, float Radius, LayerMask TargetMask, float Angle, LayerMask obstructionMask)
     {
         float n_Radius = Helpers.RangeWithColliderOffset(Transform.gameObject, Radius);
         int numColliders = Physics.OverlapSphereNonAlloc(Transform.position, n_Radius, rangeChecks, TargetMask);
@@ -68,16 +77,5 @@ public class FOVConfigScriptableObject : ScriptableObject
         // If we got here, player is detected and visible
         return true;
     }
-
-    private int ResetFOVAngle()
-    {
-        return DetectionAngle;
-    }
-
-    private int MaximizeFOVAngle()
-    {
-        return 360;
-    }
-
 
 }

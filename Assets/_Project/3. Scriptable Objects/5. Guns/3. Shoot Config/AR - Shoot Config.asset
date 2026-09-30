@@ -26,3 +26,4 @@ MonoBehaviour:
   FireMode: 1
   PelletCount: 8
   FireRate: 300
+  StaggerForce: 0

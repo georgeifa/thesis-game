@@ -42,6 +42,8 @@ public partial class MoveToLastKnownPositionAction : Action
     {
         if (enemy == null) return Status.Failure;
  
+        if (enemy.CurrentState != AIState.Investigate) return Status.Failure;
+
         // Reacquired — bail out so the graph can return to Chase.
         if (PlayerDetected.Value) return Status.Failure;
  
@@ -63,7 +65,8 @@ public partial class MoveToLastKnownPositionAction : Action
 
     protected override void OnEnd()
     {
-        enemy.AI_Locomotion.ResetPath();
+        if(enemy != null)
+            enemy.AI_Locomotion.ResetPath();
     }
 }
 

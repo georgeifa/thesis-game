@@ -13,7 +13,6 @@ public partial class MaximizeFovAction : Action
     protected override Status OnStart()
     {
         if(FOV == null) return Status.Failure;
-        FOV.Value.MaxFOVAngle();
         return Status.Success;
     }
 }

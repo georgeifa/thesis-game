@@ -10,8 +10,5 @@ public  interface IDamagable
 
     public delegate void DeathEvent();
     public event DeathEvent OnDeath;
-
-    public void TakeDamage(int Damage);
-
-    public void GetHitDirection(Vector3 hitPoint);
+    public void TakeDamage(int damage, Vector3 sourcePosition, float staggerForce = 0f);
 }

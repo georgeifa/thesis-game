@@ -12,6 +12,8 @@ public class Grenade : MonoBehaviour
 {
     public float ExplodeAfter;
     public int Damage;
+    public float StaggerForce = 35f;
+
     public float BlastRadius;
     public PoolableObject BlastVFX;
     public LayerMask TargetLayer;   // was PlayerLayer — who this grenade can damage
@@ -118,7 +120,7 @@ public class Grenade : MonoBehaviour
             if (target == null || hit.Contains(target)) continue;
             hit.Add(target);
 
-            target.TakeDamage(Damage);
+            target.TakeDamage(Damage, transform.position, StaggerForce);
         }
 
         gameObject.SetActive(false); // return to pool

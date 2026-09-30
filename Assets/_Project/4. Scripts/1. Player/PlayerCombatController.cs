@@ -209,6 +209,36 @@ public class PlayerCombatController : MonoBehaviour
     }
 
     /// <summary>
+    /// Cuts short whatever the player was doing. Called by PlayerHealthManager
+    /// when a hit lands at or above its stagger threshold — the player-side
+    /// mirror of AI_Combat.InterruptAction().
+    /// </summary>
+    public void InterruptAction()
+    {
+        switch (currentState)
+        {
+            case CombatState.Reloading:
+                activeGun?.CancelReload();       // the gun aborts its own reload state
+                animationsManager.AbortAction();
+                break;
+
+            case CombatState.SwitchingWeapon:
+            case CombatState.Throwing:
+                animationsManager.AbortAction();
+                break;
+
+            default:
+                return;   // Idle and Shooting have nothing to cut short
+        }
+
+        // A held fire button shouldn't auto-resume the instant we land in Idle —
+        // being staggered should cost you the click.
+        wasHoldingFireLastFrame = true;
+
+        SetState(CombatState.Idle);
+    }
+    
+    /// <summary>
     /// Forces the state machine back to Idle, clearing any action that was in
     /// progress when the previous soldier died. Bypasses SetState because the
     /// exit logic of the interrupted state should not run.

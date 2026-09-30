@@ -109,22 +109,31 @@ public class PlayerAnimationsManager : MonoBehaviour
 
     }
     /// <summary>
-    /// Called by PlayerCombatController when a reload is interrupted.
-    /// Returns the gun to the holder, reseats the mag, and restores both hands.
+    /// Snaps the player back to a clean, gun-in-hands state from ANY scripted
+    /// action — reload, switch or throw — at any stage of it.
+    ///
+    /// Every step here is idempotent, so this doesn't need to know what was
+    /// interrupted or how far it got. That's deliberate: one teardown path,
+    /// exercised by every interrupt, rather than three that each only run in
+    /// their own rare case.
     /// </summary>
-    public void AbortReload()
+    public void AbortAction()
     {
         animator.SetTrigger(CancelActionHash);
 
-        equipmentManager.ReturnWeaponToHolder();
-        ReseatMag();
-
-        SetRightHandIK(1f);
-        SetLeftHandIK(1f);
+        equipmentManager.ReturnWeaponToHolder();   // wherever the gun was, it's in the holder now
+        ReseatMag();                               // no-op if never detached
+        Throw_HideGrenade();                       // no-op if never shown
 
         if (magazineModel != null)
             magazineModel.SetActive(true);
+
+        SetRightHandIK(1f);
+        SetLeftHandIK(1f);
     }
+
+    /// <summary>Kept for the existing reload-interrupt call sites.</summary>
+    public void AbortReload() => AbortAction();
 
     #endregion
 

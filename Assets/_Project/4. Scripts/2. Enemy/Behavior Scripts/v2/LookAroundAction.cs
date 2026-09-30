@@ -40,6 +40,8 @@ public partial class LookAroundAction : Action
     {
         if (enemy == null) return Status.Failure;
  
+        if (enemy.CurrentState != AIState.LookAround) return Status.Failure;
+        
         // Spotted them again — abandon the search.
         if (PlayerDetected.Value) return Status.Failure;
  

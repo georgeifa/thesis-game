@@ -13,19 +13,11 @@ public partial class SetStateInBrainAction : Action
 
     protected override Status OnStart()
     {
-        if(AI_State == null || Enemy == null) return Status.Failure;
+        if(Enemy.Value == null) return Status.Failure;
 
         Enemy.Value.CurrentState = AI_State.Value;
-        return Status.Running;
-    }
-
-    protected override Status OnUpdate()
-    {
         return Status.Success;
     }
 
-    protected override void OnEnd()
-    {
-    }
 }
 

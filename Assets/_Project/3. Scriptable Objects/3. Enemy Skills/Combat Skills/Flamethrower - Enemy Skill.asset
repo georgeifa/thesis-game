@@ -15,10 +15,17 @@ MonoBehaviour:
   skillType: 1
   Cooldown: 10
   Damage: 5
+  StaggerForce: 20
+  Interruptible: 1
   Range: 3
-  Priority: 0
+  Priority: 1
+  hasSeperateFOV: 0
   Duration: 3
   TickRate: 0.5
   Prefab: {fileID: 375189677686021756, guid: 990a7b8ea0cf3834eb4a66c9e1080825, type: 3}
   WindUpTime: 1.5
   windUpPrefab: {fileID: -2860731584051807991, guid: 2c3640c7be89a834a8344669031c8c99, type: 3}
+  AnimationLeadIn: 0.5
+  TrackDuringWindUp: 1
+  TrackDuringBreath: 0
+  PoolSize: 5

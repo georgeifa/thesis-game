@@ -1671,9 +1671,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.2
-  m_Height: 0.7
+  m_Height: 0.8
   m_Direction: 0
-  m_Center: {x: -0.000000009418978, y: -0.04455065, z: 0.28}
+  m_Center: {x: -0.15, y: -0.04455065, z: 0.18}
 --- !u!1 &2591479262918082302
 GameObject:
   m_ObjectHideFlags: 0
@@ -11014,6 +11014,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7228227331286561380}
+  - component: {fileID: 3337921707296266003}
   m_Layer: 6
   m_Name: lowerarm_l
   m_TagString: Damagable
@@ -11040,6 +11041,29 @@ Transform:
   - {fileID: 5689899765640325945}
   m_Father: {fileID: 4800332277637374544}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &3337921707296266003
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5961420641031694361}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.2
+  m_Height: 0.8
+  m_Direction: 0
+  m_Center: {x: -0.4, y: 0, z: 0}
 --- !u!1 &5975611331352057267
 GameObject:
   m_ObjectHideFlags: 0
@@ -11159,9 +11183,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.2
-  m_Height: 0.7
+  m_Height: 0.8
   m_Direction: 0
-  m_Center: {x: 0.000000009418978, y: 0.04455065, z: -0.28}
+  m_Center: {x: 0.15, y: 0.04455065, z: -0.18}
 --- !u!1 &6148032775301616173
 GameObject:
   m_ObjectHideFlags: 0
@@ -11332,6 +11356,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 694998761728396895}
+  - component: {fileID: 8886082962510595279}
   m_Layer: 6
   m_Name: lowerarm_r
   m_TagString: Damagable
@@ -11358,6 +11383,29 @@ Transform:
   - {fileID: 4929384729883949726}
   m_Father: {fileID: 8601064967661686540}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &8886082962510595279
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6315068673909597207}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.2
+  m_Height: 0.8
+  m_Direction: 0
+  m_Center: {x: 0.4, y: 0, z: 0}
 --- !u!1 &6338073675328780838
 GameObject:
   m_ObjectHideFlags: 0
@@ -12147,7 +12195,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1.3, y: 1, z: 0.85}
-  m_Center: {x: -0.7, y: 0, z: 0}
+  m_Center: {x: -0.7, y: -0.18, z: 0}
 --- !u!1 &7658536279095584503
 GameObject:
   m_ObjectHideFlags: 0
@@ -12547,7 +12595,7 @@ GameObject:
   - component: {fileID: 8562187540310699582}
   - component: {fileID: 6324111230404268587}
   - component: {fileID: 4499776309015096344}
-  - component: {fileID: 1916115906080599920}
+  - component: {fileID: 6074888320272164377}
   m_Layer: 8
   m_Name: 3. Giant
   m_TagString: Damagable
@@ -12661,20 +12709,25 @@ MonoBehaviour:
   CurrentState: 0
   Health: 100
   currentHealth: 0
-  root: {fileID: 0}
+  StaggerThreshold: 25
   ResetParam: Reset
   HitDirectionParam: HitDirection
+  StaggerTrigger: Stagger
+  AlertTrigger: Alert
   behavior: {fileID: 0}
   Agent: {fileID: 0}
   Animator: {fileID: 0}
   AI_Locomotion: {fileID: 0}
   FOV: {fileID: 0}
   AI_Combat: {fileID: 0}
+  HitReaction: {fileID: 0}
   hasUtilitySkill: 0
   UtilitySkill: {fileID: 0}
   IsUsingSkill: 0
+  root: {fileID: 8953422157451104130}
   deathParticle: {fileID: 0}
   DeathSO: {fileID: 0}
+  ActiveSkillInstance: {fileID: 0}
 --- !u!114 &8562187540310699582
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12715,6 +12768,8 @@ MonoBehaviour:
   rotationSpeed: 180
   turnSlowFactor: 0.5
   maxTurnAngle: 45
+  staggerRecovery: 0.15
+  maxStaggerLockDuration: 2
   speedParam: Speed
   isMovingParam: IsMoving
   LookingAroundParam: LookingAround
@@ -12745,39 +12800,34 @@ MonoBehaviour:
   attackRange: 1
   attackCooldown: 1.5
   attackAngle: 90
-  skillsUnlocked: 0
-  hitRadius: 0.6
-  hitWindowDuration: 0.15
-  maxAttackDuration: 3
+  staggerForce: 15
+  hitRadius: 0.8
+  hitWindowDuration: 0.3
   Skills: []
   SkillsVFX: {fileID: 6374081298579672829}
+  maxAttackDuration: 3
+  maxSkillDuration: 10
   playerLayer:
     serializedVersion: 2
     m_Bits: 0
   isUsingSkill: 0
---- !u!136 &1916115906080599920
-CapsuleCollider:
+--- !u!114 &6074888320272164377
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8425021080836351282}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e033303e112d8a54ca7b348c452fc7fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitReaction
+  hitBone: {fileID: 4809834134656853699}
+  degreesPerForce: 0.4
+  maxAngle: 12
+  directionJitter: 25
+  duration: 0.35
 --- !u!1 &8456249882954925787
 GameObject:
   m_ObjectHideFlags: 0

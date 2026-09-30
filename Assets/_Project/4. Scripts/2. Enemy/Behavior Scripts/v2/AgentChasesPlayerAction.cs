@@ -6,10 +6,10 @@ using Unity.Properties;
 using UnityEngine.AI;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "Agent chases Player", story: "[Agent] chases [Player]", category: "Action", id: "e3891a780b83bbc9598c4502f62ee396")]
+[NodeDescription(name: "Agent chases Player", story: "[Enemy] chases [Player]", category: "Action", id: "e3891a780b83bbc9598c4502f62ee396")]
 public partial class AgentChasesPlayerAction : Action
 {
-    [SerializeReference] public BlackboardVariable<GameObject> Agent;
+    [SerializeReference] public BlackboardVariable<Enemy> Enemy;
     [SerializeReference] public BlackboardVariable<GameObject> Player;
    
 
@@ -19,21 +19,18 @@ public partial class AgentChasesPlayerAction : Action
     [Tooltip("Variable to determine if agent should / can follow the player.")]
     [SerializeReference] public BlackboardVariable<bool> FollowPlayer;
 
-    [SerializeReference] public BlackboardVariable<SkillsScriptableObject> SeparateSkill;
+    [SerializeReference] public BlackboardVariable<SkillsScriptableObject> SkillToUse;
 
-    private Enemy enemy;
     private float StoppingDistance;
     private float timer = 0f;
 
 
     protected override Status OnStart()
     {
-        if(Agent == null || Player == null) return Status.Failure;
-        enemy = Agent.Value.GetComponent<Enemy>();
-        if(enemy == null) return Status.Failure;
+        if(Enemy?.Value == null || Player?.Value == null) return Status.Failure;
 
 
-        StoppingDistance = Agent.Value.GetComponent<NavMeshAgent>().stoppingDistance;
+        StoppingDistance = Enemy.Value.Agent.stoppingDistance;
         return Status.Running;
     }
 
@@ -41,19 +38,19 @@ public partial class AgentChasesPlayerAction : Action
     {  
         // The state may have moved on (lost sight → Investigate) while this node was
         // Running. A Running node parks the branch, so it has to bail out itself.
-        if (enemy.CurrentState != AIState.Chase) return Status.Failure;
+        if (Enemy.Value.CurrentState != AIState.Chase) return Status.Failure;
 
         if (FollowPlayer)
         {
-            if(enemy.AI_Combat.EnemyIn)
+            if(Enemy.Value.AI_Combat.EnemyIn)
                 return Status.Success;
 
-            for(int i=0; i<enemy.AI_Combat.EnemyInSkill.Count;i++)
+            for(int i=0; i<Enemy.Value.AI_Combat.EnemyInSkill.Count;i++)
             {
-                if(enemy.AI_Combat.EnemyInSkill[i]){
-                    SkillsScriptableObject skill = enemy.AI_Combat.GetSeparateSkill(i);
-                    if(enemy.AI_Combat.CanUseSkill(skill,Player)){
-                        SeparateSkill.Value = skill;
+                if(Enemy.Value.AI_Combat.EnemyInSkill[i]){
+                    SkillsScriptableObject skill = Enemy.Value.AI_Combat.GetSeparateSkill(i);
+                    if(Enemy.Value.AI_Combat.CanUseSkill(skill,Player)){
+                        SkillToUse.Value = skill;
                         return Status.Success;
                     }
                 }           
@@ -78,11 +75,11 @@ public partial class AgentChasesPlayerAction : Action
     void UpdateDestination()
     {
 
-        enemy.AI_Locomotion.SetDestination(Player.Value.transform.position);
+        Enemy.Value.AI_Locomotion.SetDestination(Player.Value.transform.position);
             
         // Draw debug line
         Debug.DrawLine(
-                Agent.Value.transform.position + Vector3.up, 
+                Enemy.Value.transform.position + Vector3.up, 
                 Player.Value.transform.position + Vector3.up, 
                 Color.yellow, 
                 UpdateInterval
@@ -91,7 +88,7 @@ public partial class AgentChasesPlayerAction : Action
 
     Status CheckDistance()
     {        
-        float distance = Vector3.Distance(Agent.Value.transform.position, Player.Value.transform.position);
+        float distance = Vector3.Distance(Enemy.Value.transform.position, Player.Value.transform.position);
 
         if (distance <= StoppingDistance)
         {
@@ -103,7 +100,7 @@ public partial class AgentChasesPlayerAction : Action
 
     protected override void OnEnd()
     {
-        enemy.AI_Locomotion.ResetPath();
+        Enemy.Value.AI_Locomotion.ResetPath();
     }
 }
 

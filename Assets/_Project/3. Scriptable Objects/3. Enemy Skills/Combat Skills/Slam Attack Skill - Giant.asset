@@ -13,13 +13,18 @@ MonoBehaviour:
   m_Name: Slam Attack Skill - Giant
   m_EditorClassIdentifier: 
   skillType: 1
-  Cooldown: 1
-  Damage: 100
+  Cooldown: 10
+  Damage: 20
+  StaggerForce: 20
+  Interruptible: 1
   Range: 4
   Priority: 0
-  VFX_Prefab: {fileID: 5176799598798302556, guid: 711907c3e14871349b5b580430e06d86, type: 3}
+  hasSeperateFOV: 0
   WindUpTime: 1.35
-  SpawnOffset: {x: -0.2, y: 0, z: 1.8}
   PlayerLayerMask:
     serializedVersion: 2
     m_Bits: 128
+  VFX_Prefab: {fileID: 5176799598798302556, guid: 711907c3e14871349b5b580430e06d86, type: 3}
+  SpawnOffset: {x: -0.2, y: 0, z: 1.8}
+  VFXLifetime: 2
+  PoolSize: 5

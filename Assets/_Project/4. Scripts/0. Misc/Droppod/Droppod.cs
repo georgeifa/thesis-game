@@ -136,8 +136,7 @@ public class DropPod : MonoBehaviour
             IDamagable target = col.GetComponentInParent<IDamagable>();
             if (target == null || !alreadyHit.Add(target)) continue;
 
-            target.GetHitDirection(landingPoint);
-            target.TakeDamage(impactDamage);
+            target.TakeDamage(impactDamage, landingPoint, 100f);
         }
     }
 

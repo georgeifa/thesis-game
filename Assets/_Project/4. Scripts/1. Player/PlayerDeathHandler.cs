@@ -30,6 +30,8 @@ public class PlayerDeathHandler : MonoBehaviour
     [SerializeField] private bool enableDebugDamage = true;
     [SerializeField] private KeyCode debugDamageKey = KeyCode.K;
     [SerializeField] private int debugDamageAmount = 25;
+    [SerializeField] private float debugStuggerAmount = 5f;
+
 
     private PlayerHealthManager health;
     private PlayerCombatController combat;
@@ -186,7 +188,6 @@ public class PlayerDeathHandler : MonoBehaviour
                 hitFrom = ray.GetPoint(dist);
         }
 
-        health.GetHitDirection(hitFrom);
-        health.TakeDamage(debugDamageAmount);
+        health.TakeDamage(debugDamageAmount, hitFrom,debugStuggerAmount);
     }
 }

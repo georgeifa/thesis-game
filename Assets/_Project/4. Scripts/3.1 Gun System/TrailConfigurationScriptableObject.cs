@@ -49,13 +49,11 @@ public class TrailConfigurationScriptableObject : ScriptableObject
             SurfaceManager.Instance.HandleImpact(
                 hit.transform.gameObject, endPoint, hit.normal, ImpactType, 0);
 
-            // The interface is the test — no tag needed. GetComponentInParent walks up
-            // so hitboxes can live on child meshes.
+
             IDamagable damagable = hit.collider.GetComponentInParent<IDamagable>();
             if (damagable != null)
             {
-                damagable.GetHitDirection(hit.point);
-                damagable.TakeDamage(DamageConfig.GetDamage(distance));
+                damagable.TakeDamage(DamageConfig.GetDamage(distance), startPoint, GunConfig.ShootConfig.StaggerForce);
             }
         }
 

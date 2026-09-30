@@ -25,7 +25,7 @@ public class AreaDamage : MonoBehaviour
         WaitForSeconds Wait = new WaitForSeconds(TickRate);
         while(Damagable != null)
         {
-            Damagable.TakeDamage(Damage);
+            Damagable.TakeDamage(Damage, transform.position, 3f);
             yield return Wait;
         }
     }

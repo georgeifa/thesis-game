@@ -1,14 +1,14 @@
 fileFormatVersion: 2
-guid: 1d02b0351eb01e646bce7d1eda36bf38
+guid: 702568aec1741804a9792257d5de4ad5
 AssetOrigin:
   serializedVersion: 1
-  productId: 322508
-  packageName: Cyborg Mutant3
+  productId: 324813
+  packageName: Cyborg Giant
   packageVersion: 1.0
-  assetPath: Assets/Cyborg Mutant3/Animations/AS_Cyborg_Mutant3@GetHit_B2.fbx
-  uploadId: 761946
+  assetPath: Assets/Cyborg Giant/Animations/AS_Cyborg_Giant@GetHit_L.fbx
+  uploadId: 768000
 ModelImporter:
-  serializedVersion: 22200
+  serializedVersion: 24200
   internalIDToNameTable: []
   externalObjects: {}
   materials:
@@ -36,7 +36,43 @@ ModelImporter:
     animationWrapMode: 0
     extraExposedTransformPaths: []
     extraUserProperties: []
-    clipAnimations: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: GetHit_L
+      takeName: Take 001
+      internalID: 1827226128182048838
+      firstFrame: 0
+      lastFrame: 65
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events:
+      - time: 0.5221675
+        functionName: OnSkillComplete
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 377d7e7674da00b43a7b193f3d3c1429, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
     isReadable: 0
   meshes:
     lODScreenPercentages: []
@@ -63,6 +99,9 @@ ModelImporter:
     maxBonesPerVertex: 4
     minBoneWeight: 0.001
     optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
     meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
@@ -100,7 +139,7 @@ ModelImporter:
     hasTranslationDoF: 0
     hasExtraRoot: 0
     skeletonHasParents: 1
-  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: c110a94075d044543bdf731fec9e6a2b, type: 3}
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: 1541894f1b65f9d4fbd5cd7bd5662afc, type: 3}
   autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1

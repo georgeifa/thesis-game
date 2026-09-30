@@ -10,7 +10,7 @@ public partial class DoesEnemyHaveUtilitySkillCondition : Condition
 
     public override bool IsTrue()
     {
-        if(Enemy == null)   return false;
+        if(Enemy?.Value == null)   return false;
 
         return Enemy.Value.hasUtilitySkill;
     }

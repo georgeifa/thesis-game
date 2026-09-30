@@ -54,31 +54,34 @@ public class EnemySpawner : MonoBehaviour
 
     private void SpawnEnemy()
     {
-        int RandomEnemyIndex = Random.Range(0, Enemies.Count);
+        int index = Random.Range(0, Enemies.Count);
+        PoolableObject poolableObject = EnemyObjectPools[index].GetObject();
 
-        PoolableObject poolableObject = EnemyObjectPools[RandomEnemyIndex].GetObject();
-
-        if(poolableObject != null)
+        if (poolableObject == null)
         {
-            Enemy enemy = poolableObject.GetComponent<Enemy>();
-            Enemies[RandomEnemyIndex].SetupEnemy(enemy,Player.gameObject);
-
-            int VertexIndex = Random.Range(0,triangulation.vertices.Length);
-
-            NavMeshHit hit;
-            if(NavMesh.SamplePosition(triangulation.vertices[VertexIndex],out hit, 2f, 1))
-            {
-                enemy.Agent.Warp(hit.position);
-                enemy.Agent.enabled = true;
-            }
-            else
-            {
-                Debug.LogError($"Unable to place NavMeshAgent on NavMesh, Tried to use {triangulation.vertices[VertexIndex]}");
-            }
+            Debug.LogError($"Unable to fetch enemy of type {index} from the pool. Out of objects?");
+            return;
         }
-        else
+
+        Enemy enemy = poolableObject.GetComponent<Enemy>();
+
+        // ── 1. PLACE FIRST ───────────────────────────────────────────────────
+        // Configuration has to happen at the FINAL position: ResetForSpawn skips
+        // every NavMesh call when the agent isn't on the mesh, and a pooled enemy
+        // sits underground where the sink left it until it's warped.
+        int vertexIndex = Random.Range(0, triangulation.vertices.Length);
+
+        if (!NavMesh.SamplePosition(triangulation.vertices[vertexIndex], out NavMeshHit hit, 2f, NavMesh.AllAreas))
         {
-            Debug.LogError($"Unable to fetch enemy of type {RandomEnemyIndex} from object pool. Out of objects?");
+            Debug.LogError($"Unable to place NavMeshAgent on NavMesh at {triangulation.vertices[vertexIndex]}");
+            poolableObject.gameObject.SetActive(false);   // give it back rather than leaking it
+            return;
         }
-    } 
+
+        enemy.Agent.enabled = true;      // Warp on a disabled agent silently fails
+        enemy.Agent.Warp(hit.position);
+
+        // ── 2. THEN CONFIGURE ────────────────────────────────────────────────
+        Enemies[index].SetupEnemy(enemy, Player.gameObject);
+    }
 }

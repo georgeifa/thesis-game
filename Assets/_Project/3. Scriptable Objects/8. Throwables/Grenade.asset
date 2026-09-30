@@ -16,11 +16,12 @@ MonoBehaviour:
   GrenadePrefab: {fileID: 970388684061182944, guid: 1a17a71b31d86d749ad97e7b07ef315f, type: 3}
   ThrowableModel: {fileID: 1383632906025432633, guid: 610bf6e50defcae4eb38504db7250b5e, type: 3}
   ExplosionVFX: {fileID: 11400000, guid: c8bfb98f4ee59cb488fe78f1bf0ad9fb, type: 2}
-  Damage: 120
+  Damage: 10
+  StaggerForce: 35
   BlastRadius: 4
-  ExplodeAfter: 2.5
+  ExplodeAfter: 0.1
   TargetLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   MinArcHeight: 2.5
   MaxArcHeight: 3.5

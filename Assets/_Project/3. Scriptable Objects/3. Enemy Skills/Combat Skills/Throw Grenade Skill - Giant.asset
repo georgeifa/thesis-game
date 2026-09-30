@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: Throw Grenade Skill - Giant
   m_EditorClassIdentifier: 
   skillType: 1
-  Cooldown: 4
+  Cooldown: 6
   Damage: 5
+  StaggerForce: 20
+  Interruptible: 0
   Range: 8
   Priority: 2
   hasSeperateFOV: 1
@@ -27,3 +29,5 @@ MonoBehaviour:
     m_Bits: 128
   minArcHeight: 2
   maxArcHeight: 5
+  ThrowDelay: 0.1
+  PoolSize: 5

@@ -71,6 +71,7 @@ public class PlayerEquipmentManager : MonoBehaviour
  
     public int GrenadeCount => grenadeCount;
     public Transform ThrowPoint => throwPoint;
+    private ObjectPool explosionVfxPool;
  
 
     // ─────────────────────────────────────────────
@@ -83,6 +84,7 @@ public class PlayerEquipmentManager : MonoBehaviour
         MakeActiveAndHold(EquipmentSlot.Primary);
 
         grenadePool  = ObjectPool.CreateInstance(EquippedGrenade.GrenadePrefab, 10);
+        explosionVfxPool = ObjectPool.CreateInstance(EquippedGrenade.ExplosionVFX.explosionPrefab,10);
         grenadeCount = startingGrenades;
     }
 
@@ -314,8 +316,7 @@ public class PlayerEquipmentManager : MonoBehaviour
         grenade.ExplodeAfter = EquippedGrenade.ExplodeAfter;
         grenade.TargetLayer  = EquippedGrenade.TargetLayer;
  
-        ObjectPool vfxPool = ObjectPool.CreateInstance(EquippedGrenade.ExplosionVFX.explosionPrefab, 5);
-        PoolableObject blastVFX = vfxPool.GetObject();
+        PoolableObject blastVFX = explosionVfxPool.GetObject();
         blastVFX.gameObject.SetActive(false);
         EquippedGrenade.ExplosionVFX.SetupExplosion(blastVFX.gameObject);
  

@@ -83,6 +83,14 @@ public class PlayerHealthManager : MonoBehaviour, IDamagable
 
     public bool IsDead { get; private set; }
 
+    [Header("State")]
+    [Tooltip("True from death until the new soldier is handed control. Deployment " +
+            "takes several seconds during which the player has no input, so being " +
+            "targetable then is a free kill for the enemies.")]
+    public bool IsInvulnerable { get; private set; }
+
+    public void SetInvulnerable(bool value) => IsInvulnerable = value;
+
     // Where the last hit came from, for directional feedback.
     private Vector3 lastDamageSource;
     private bool hasDamageSource;
@@ -165,7 +173,7 @@ public class PlayerHealthManager : MonoBehaviour, IDamagable
     /// </param>
     public void TakeDamage(int damage, Vector3 sourcePosition, float staggerForce = 0f)
     {
-        if (IsDead) return;
+        if (IsDead || IsInvulnerable) return;
 
         lastDamageSource = sourcePosition;
         hasDamageSource = true;

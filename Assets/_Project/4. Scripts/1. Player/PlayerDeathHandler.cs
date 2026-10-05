@@ -80,12 +80,12 @@ public class PlayerDeathHandler : MonoBehaviour
     {
         SpawnCorpse();
 
-        // Disabling the components stops their Update loops, which halts the
-        // combat state machine, movement and input.
+        health.SetInvulnerable(true);     // stays true through the whole deployment
+
         input.enabled      = false;
         combat.enabled     = false;
         movement.enabled   = false;
-        controller.enabled = false;
+        controller.enabled = false;       // also what makes you undetectable
 
         if (playerVisual != null)
             playerVisual.SetActive(false);
@@ -145,16 +145,14 @@ public class PlayerDeathHandler : MonoBehaviour
     /// </summary>
     public void PlaceSoldier(Vector3 position, Quaternion rotation)
     {
-        // The controller is already disabled from Die(); it would otherwise
-        // fight the teleport, so it stays off until the transform is set.
         transform.SetPositionAndRotation(position, rotation);
-        controller.enabled = true;
+        // controller stays OFF — see ActivateSoldier. Nothing needs it while the
+        // soldier stands still through the dissolve, and leaving it off keeps the
+        // materialising body out of every overlap check.
 
         health.ResetHealth();
         equipment.ResetLoadout();
 
-        // The previous soldier may have died mid-reload. Rebind returns every
-        // layer and parameter to default so the new one doesn't resume it.
         animator.Rebind();
         animator.Update(0f);
 
@@ -165,9 +163,11 @@ public class PlayerDeathHandler : MonoBehaviour
             playerVisual.SetActive(true);
     }
 
-    /// <summary>Hands control to the player. Called when materialisation finishes.</summary>
     public void ActivateSoldier()
     {
+        controller.enabled = true;        // solid again
+        health.SetInvulnerable(false);    // and vulnerable again
+
         input.enabled    = true;
         combat.enabled   = true;
         movement.enabled = true;

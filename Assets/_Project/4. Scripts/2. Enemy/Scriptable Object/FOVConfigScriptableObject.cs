@@ -11,6 +11,9 @@ public class FOVConfigScriptableObject : ScriptableObject
     [Range(0, 360)] public int PatrolDetectionAngle;
 
     [Header("Alerted (chase / investigate)")]
+    [Tooltip("The radius around the enemy where they still aware of the player after they have been alerted")]
+    public float patrolAwarenessRadius = 0f;
+    public float alertedAwarenessRadius =5f;
     [Tooltip("Longer than the patrol radius, so breaking contact needs real distance.")]
     public float AlertedRadius = 25f;
     [Tooltip("Wider than the patrol cone so running wide doesn't break contact. 360 means the enemy can never lose you by movement alone — 180-220 usually plays better.")]
@@ -27,6 +30,8 @@ public class FOVConfigScriptableObject : ScriptableObject
         enemy.FOV.interval = interval;
         enemy.FOV.SetPatrolRadius_Angle(PatrolRadius,PatrolDetectionAngle);
         enemy.FOV.SetAlertedRadius_Angle(AlertedRadius,AlertedDetectionAngle);
+        enemy.FOV.SetPatrolAwareness(patrolAwarenessRadius);     // 0 for most enemies
+        enemy.FOV.SetAlertedAwareness(alertedAwarenessRadius);   // Giant ~5, mutants ~3
 
         enemy.FOV.targetMask = targetMask;
         enemy.FOV.obstructionMask = obstructionMask;

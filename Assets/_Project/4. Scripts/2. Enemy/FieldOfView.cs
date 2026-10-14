@@ -18,6 +18,11 @@ using UnityEngine;
 /// angle per weapon or skill. Those are fixed per poll and unaffected by
 /// alerted/patrol mode. That is what `isForCombat` selects between.
 ///
+/// ⚠ The two kinds ask DIFFERENT QUESTIONS and must not share behaviour beyond
+/// the loop itself. Perception asks "do I know where the player is". Combat asks
+/// "is the player in front of me, within reach". Anything that answers one must
+/// be gated off the other — see the Close-range Awareness region.
+///
 /// ── POOLING ─────────────────────────────────────────────────────────────
 /// ⚠ The perception routine MUST be restarted on spawn. Deactivating a
 /// GameObject kills its coroutines permanently, so a routine started from
@@ -51,7 +56,8 @@ public class FieldOfView : MonoBehaviour
     public LayerMask targetMask;
     public LayerMask obstructionMask;
 
-    [Tooltip("Result of the last perception poll. Read by the behavior graph.")]
+    [Tooltip("Result of the last PERCEPTION poll. Read by the behavior graph. " +
+             "Combat polls must never write this.")]
     public bool playerDetected;
 
     #endregion
@@ -65,6 +71,13 @@ public class FieldOfView : MonoBehaviour
     private int patrolDetectionAngle;
     private float alertedRadius;
     private int alertedDetectionAngle;
+
+    // Close-range awareness, swapped alongside the cone. See the region below.
+    private float patrolAwarenessRadius;
+    private float alertedAwarenessRadius;
+    private float awarenessRadius;
+
+    private readonly Collider[] awarenessBuffer = new Collider[4];
 
     private Coroutine perceptionRoutine;
 
@@ -102,6 +115,9 @@ public class FieldOfView : MonoBehaviour
         // enemy is blind AND convinced it can see you.
         playerDetected = false;
 
+        // The radius/angle arguments are vestigial for a perception poll — the
+        // loop re-reads the live fields each tick when isForCombat is false.
+        // They are passed anyway to keep one signature for both uses.
         perceptionRoutine = StartCoroutine(FOVRoutine(
             Mathf.Max(0.02f, interval),
             isForCombat: false,
@@ -130,9 +146,9 @@ public class FieldOfView : MonoBehaviour
     /// </summary>
     /// <param name="isForCombat">
     /// True: use the radius and angle passed in, fixed for the life of the poll
-    /// (attack range, skill range). False: re-read this component's live radius
-    /// and DetectionAngle every tick, so alerted/patrol switching applies
-    /// without restarting.
+    /// (attack range, skill range), cone test ONLY. False: re-read this
+    /// component's live radius and DetectionAngle every tick, so alerted/patrol
+    /// switching applies without restarting, and allow close-range awareness.
     /// </param>
     /// <param name="onComplete">Receives the result of every poll.</param>
     public IEnumerator FOVRoutine(float interval, bool isForCombat, Transform transform,
@@ -150,13 +166,62 @@ public class FieldOfView : MonoBehaviour
 
             // Null-guarded: the check is supplied by the config, and a poll can
             // tick before configuration on the first frame after a spawn.
-            bool result = PerformFOVCheck != null
-                       && PerformFOVCheck(transform, checkRadius, targetMask, checkAngle, obstructionMask);
+            bool seen = PerformFOVCheck != null &&
+                        PerformFOVCheck(transform, checkRadius, targetMask, checkAngle, obstructionMask);
 
-            onComplete?.Invoke(result);
+            // ⚠ PERCEPTION ONLY. A combat poll is asking whether the player is
+            // in front of this enemy and within reach; proximity answers "yes"
+            // while the enemy is facing the wrong way, which makes it swing at
+            // nothing. Keep this gated.
+            if (!isForCombat && !seen)
+                seen = CheckProximityAwareness();
+
+            // NOTE: this loop does NOT assign playerDetected. The perception
+            // caller does that through onComplete; a combat caller writing it
+            // would stomp the perception result with an attack-range answer ten
+            // times a second.
+            onComplete?.Invoke(seen);
         }
     }
 
+    #endregion
+
+    #region Close-range Awareness
+    // The cone is a VISION model. It is correct for distance and wrong for
+    // contact: an enemy you are standing beside knows you are there whether or
+    // not it is facing you. Without this, circling an attacking enemy drops its
+    // aggro — not because it lost you, but because its head didn't turn.
+    //
+    // Swapped with the cone between modes, and normally 0 while patrolling:
+    // approaching an unaware enemy from behind should work. Once it is already
+    // fighting you, standing behind it should not make you disappear.
+
+    /// <summary>Called by the config. Usually 0 — stealth approach stays viable.</summary>
+    public void SetPatrolAwareness(float radius) => patrolAwarenessRadius = radius;
+
+    /// <summary>Called by the config. Roughly the enemy's reach plus a little.</summary>
+    public void SetAlertedAwareness(float radius) => alertedAwarenessRadius = radius;
+
+    private bool CheckProximityAwareness()
+    {
+        if (awarenessRadius <= 0f) return false;
+
+        int count = Physics.OverlapSphereNonAlloc(
+            transform.position, awarenessRadius, awarenessBuffer, targetMask);
+
+        for (int i = 0; i < count; i++)
+        {
+            Vector3 toTarget = awarenessBuffer[i].transform.position - transform.position;
+            float dist = toTarget.magnitude;
+
+            if (dist < 0.01f) return true;
+
+            // Still respects walls — you can break contact by putting cover between us.
+            if (!Physics.Raycast(transform.position, toTarget / dist, dist, obstructionMask))
+                return true;
+        }
+        return false;
+    }
     #endregion
 
     #region Alerted / Patrol Modes
@@ -183,6 +248,7 @@ public class FieldOfView : MonoBehaviour
     {
         radius = alertedRadius;
         DetectionAngle = alertedDetectionAngle;
+        awarenessRadius = alertedAwarenessRadius;
     }
 
     /// <summary>
@@ -194,6 +260,7 @@ public class FieldOfView : MonoBehaviour
     {
         radius = patrolRadius;
         DetectionAngle = patrolDetectionAngle;
+        awarenessRadius = patrolAwarenessRadius;
     }
 
     #endregion

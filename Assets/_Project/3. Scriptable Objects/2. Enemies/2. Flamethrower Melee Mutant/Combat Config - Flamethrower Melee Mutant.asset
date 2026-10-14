@@ -18,9 +18,14 @@ MonoBehaviour:
   skillTrigger: SkillNo
   isRanged: 0
   damage: 15
-  attackRange: 1
+  attackRange: 1.6
   attackCooldown: 1.5
   attackAngle: 45
+  staggerForce: 15
+  hitRadius: 0.6
+  hitWindowDuration: 0.2
+  maxAttackDuration: 3
+  maxSkillDuration: 10
   Skills:
   - {fileID: 11400000, guid: de8efc4e4ad3f5f4f82c95e53d337e16, type: 2}
   playerLayer:

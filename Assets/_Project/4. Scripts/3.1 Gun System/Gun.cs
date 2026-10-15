@@ -174,6 +174,7 @@ public class Gun : MonoBehaviour
         {
             LastShootTime = Time.time;
 
+            RunStats.ReportShotFired(1);
             switch (gunData.ShootConfig.FireMode)
             {
                 case FireMode.FullAuto:

@@ -15,7 +15,8 @@ public class Grenade : MonoBehaviour
     public float StaggerForce = 35f;
 
     public float BlastRadius;
-    public PoolableObject BlastVFX;
+    [System.NonSerialized] public ObjectPool BlastVFXPool;
+    [System.NonSerialized] public ExplosionScriptableObject ExplosionConfig;
     public LayerMask TargetLayer;   // was PlayerLayer — who this grenade can damage
 
     [Header("Blink Light (optional)")]
@@ -29,12 +30,6 @@ public class Grenade : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-    }
-
-    private void Start()
-    {
-        if (BlastVFX != null)
-            BlastVFX.GetComponent<AdjustableExplosion>().Adjust(BlastRadius);
     }
 
     /// <summary>
@@ -100,13 +95,8 @@ public class Grenade : MonoBehaviour
         if (blinkLight != null)
             blinkLight.enabled = false;
 
-        // Fire the pooled VFX + decal at our position.
-        if (BlastVFX != null)
-        {
-            BlastVFX.transform.SetPositionAndRotation(transform.position, transform.rotation);
-            BlastVFX.gameObject.SetActive(true);
-            BlastVFX.GetComponent<SpawnExplosionDecal>().SpawnDecal();
-        }
+            // Fire the pooled VFX + decal at our position.
+        SpawnBlastVFX();
 
         // Damage every unique IDamagable in the blast radius (multi-target).
         Collider[] colliders = new Collider[16];
@@ -124,6 +114,21 @@ public class Grenade : MonoBehaviour
         }
 
         gameObject.SetActive(false); // return to pool
+    }
+
+    private void SpawnBlastVFX()
+    {
+        if (BlastVFXPool == null) return;
+
+        // Acquired at detonation, positioned by the pool as it activates.
+        PoolableObject vfx = BlastVFXPool.GetObject(transform.position, transform.rotation);
+        if (vfx == null) return;
+
+        ExplosionConfig?.SetupExplosion(vfx.gameObject);
+
+        // Guarded: the original GetComponent would NRE on a prefab without a decal.
+        if (vfx.TryGetComponent(out SpawnExplosionDecal decal))
+            decal.SpawnDecal();
     }
 
     private void OnDrawGizmosSelected()

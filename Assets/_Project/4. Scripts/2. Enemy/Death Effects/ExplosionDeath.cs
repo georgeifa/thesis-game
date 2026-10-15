@@ -59,26 +59,26 @@ public class ExplosionDeath : DeathScriptableObject
     // time, none reclaimed — AND never returned the instance it took, so after
     // PoolSize explosions there was no VFX at all.
     [System.NonSerialized] private ObjectPool explosionPool;
+
+        // A pool owns scene GameObjects, and this is a ScriptableObject — an ASSET.
+    // It outlives the scene, and its fields are not reset when "Reload Domain"
+    // is disabled in Enter Play Mode Options. So a cached pool can go stale at
+    // TWO different boundaries: a scene reload and a play-mode restart.
+    //
+    // ObjectPool.Session is bumped at both. The private counter this replaces
+    // tracked only play-mode starts — which is why Retry broke every pool in
+    // the game at once.
     [System.NonSerialized] private int poolSession = -1;
-
-    // A pool owns scene objects, which die with play mode. ScriptableObject
-    // fields are NOT reset when "Reload Domain" is off in Enter Play Mode
-    // Options, so a cached pool can survive into the next session pointing at
-    // destroyed objects. Bumping a counter before each run self-invalidates it.
-    private static int session;
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void NewSession() => session++;
 
     private void EnsurePool()
     {
-        if (poolSession == session && explosionPool != null) return;
+        if (poolSession == ObjectPool.Session && explosionPool != null) return;
 
         explosionPool = ExplosionPrefab != null
             ? ObjectPool.CreateInstance(ExplosionPrefab, PoolSize)
             : null;
 
-        poolSession = session;
+        poolSession = ObjectPool.Session;
     }
 
     #endregion

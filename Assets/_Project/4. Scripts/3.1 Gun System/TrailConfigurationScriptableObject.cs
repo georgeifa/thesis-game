@@ -53,6 +53,7 @@ public class TrailConfigurationScriptableObject : ScriptableObject
             IDamagable damagable = hit.collider.GetComponentInParent<IDamagable>();
             if (damagable != null)
             {
+                RunStats.ReportShotHit(1);
                 damagable.TakeDamage(DamageConfig.GetDamage(distance), startPoint, GunConfig.ShootConfig.StaggerForce);
             }
         }

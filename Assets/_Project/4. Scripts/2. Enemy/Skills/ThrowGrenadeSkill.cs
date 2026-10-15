@@ -46,16 +46,20 @@ public class ThrowGrenadeSkill : SkillsScriptableObject
     // SetupGrenade. Two fresh pools and ten new objects every single grenade.
     [System.NonSerialized] private ObjectPool grenadePool;
     [System.NonSerialized] private ObjectPool explosionPool;
+    
+        // A pool owns scene GameObjects, and this is a ScriptableObject — an ASSET.
+    // It outlives the scene, and its fields are not reset when "Reload Domain"
+    // is disabled in Enter Play Mode Options. So a cached pool can go stale at
+    // TWO different boundaries: a scene reload and a play-mode restart.
+    //
+    // ObjectPool.Session is bumped at both. The private counter this replaces
+    // tracked only play-mode starts — which is why Retry broke every pool in
+    // the game at once.
     [System.NonSerialized] private int poolSession = -1;
-
-    private static int session;
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void NewSession() => session++;
 
     private void EnsurePools()
     {
-        if (poolSession == session && grenadePool != null && explosionPool != null) return;
+        if (poolSession == ObjectPool.Session && grenadePool != null && explosionPool != null) return;
 
         grenadePool = grenadePrefab != null
             ? ObjectPool.CreateInstance(grenadePrefab, PoolSize) : null;
@@ -63,7 +67,7 @@ public class ThrowGrenadeSkill : SkillsScriptableObject
         explosionPool = ExplosionVFX != null && ExplosionVFX.explosionPrefab != null
             ? ObjectPool.CreateInstance(ExplosionVFX.explosionPrefab, PoolSize) : null;
 
-        poolSession = session;
+        poolSession = ObjectPool.Session;
     }
 
     #endregion
@@ -152,19 +156,17 @@ public class ThrowGrenadeSkill : SkillsScriptableObject
         grenade.ExplodeAfter = grenadeExplodeAfter;
         grenade.TargetLayer  = playerLayer;
 
-        if (explosionPool == null) return;
-
-        PoolableObject blastVFX = explosionPool.GetObject();
-        if (blastVFX == null)
-        {
-            Debug.LogWarning($"{name}: explosion VFX pool exhausted — the grenade will " +
-                             "detonate with no visual.");
-            return;
-        }
-
-        blastVFX.gameObject.SetActive(false);
-        ExplosionVFX.SetupExplosion(blastVFX.gameObject);
-        grenade.BlastVFX = blastVFX;
+        // Hand over the POOL, not an instance.
+        //
+        // Taking an instance here and deactivating it to keep it hidden returned it
+        // to the pool immediately - PoolableObject.OnDisable is the return path -
+        // while the grenade went on holding the reference. Two grenades in the air
+        // could be given the same VFX.
+        //
+        // A pooled object you are not using yet is a pooled object you should not
+        // be holding.
+        grenade.BlastVFXPool    = explosionPool;
+        grenade.ExplosionConfig = ExplosionVFX;
     }
 
     #endregion

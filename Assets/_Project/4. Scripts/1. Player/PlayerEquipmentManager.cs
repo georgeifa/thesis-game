@@ -287,19 +287,36 @@ public class PlayerEquipmentManager : MonoBehaviour
     public void ThrowGrenade(Vector3 targetGroundPoint)
     {
         if (grenadeCount <= 0 || EquippedGrenade == null || throwPoint == null) return;
- 
-        PoolableObject obj = grenadePool.GetObject();
-        obj.transform.SetPositionAndRotation(throwPoint.position, Quaternion.identity);
-        obj.gameObject.SetActive(true);
- 
+        if (grenadePool == null) return;
+
+        // POSITION BEFORE ACTIVATION. GetObject() with no arguments places the
+        // grenade at the world origin and activates it there, and only then did we
+        // move it — one frame as a live rigidbody in the wrong place, which the
+        // physics engine has already seen and resolved.
+        //
+        // Same rule as EnemySpawner: place first, configure second.
+        PoolableObject obj = grenadePool.GetObject(throwPoint.position, Quaternion.identity);
+        if (obj == null)
+        {
+            Debug.LogWarning("Grenade pool exhausted — increase its size.");
+            return;
+        }
+
         Grenade grenade = obj.GetComponent<Grenade>();
+        if (grenade == null)
+        {
+            Debug.LogWarning("Grenade prefab has no Grenade component.");
+            obj.gameObject.SetActive(false);
+            return;
+        }
+
         ConfigureGrenade(grenade);
- 
+
         Vector3 velocity = Helpers.CalculateArcVelocity(
-            throwPoint.position, targetGroundPoint, MinFlightTime,MaxFlightTime,MaxThrowDistance);
- 
+            throwPoint.position, targetGroundPoint, MinFlightTime, MaxFlightTime, MaxThrowDistance);
+
         grenade.Launch(velocity);
- 
+
         grenadeCount--;
     }
 
@@ -315,12 +332,10 @@ public class PlayerEquipmentManager : MonoBehaviour
         grenade.Damage       = EquippedGrenade.Damage;
         grenade.ExplodeAfter = EquippedGrenade.ExplodeAfter;
         grenade.TargetLayer  = EquippedGrenade.TargetLayer;
- 
-        PoolableObject blastVFX = explosionVfxPool.GetObject();
-        blastVFX.gameObject.SetActive(false);
-        EquippedGrenade.ExplosionVFX.SetupExplosion(blastVFX.gameObject);
- 
-        grenade.BlastVFX = blastVFX;
+
+        // Hand over the POOL, not an instance — the grenade acquires at detonation.
+        grenade.BlastVFXPool    = explosionVfxPool;
+        grenade.ExplosionConfig = EquippedGrenade.ExplosionVFX;
     }
  
     #endregion

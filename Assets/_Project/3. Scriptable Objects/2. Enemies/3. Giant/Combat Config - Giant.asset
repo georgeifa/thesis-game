@@ -23,7 +23,7 @@ MonoBehaviour:
   attackAngle: 45
   staggerForce: 15
   hitRadius: 0.7
-  hitWindowDuration: 0.2
+  hitWindowDuration: 0.6
   maxAttackDuration: 3
   maxSkillDuration: 10
   Skills:

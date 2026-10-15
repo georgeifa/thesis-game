@@ -341,6 +341,8 @@ public class Enemy : PoolableObject, IDamagable
             currentHealth -= damageTaken;
             OnTakeDamage?.Invoke(damageTaken);
 
+            RunStats.ReportDamageDealt(damageTaken);
+
             if (currentHealth <= 0)
             {
                 OnDeath?.Invoke();
@@ -560,6 +562,7 @@ public class Enemy : PoolableObject, IDamagable
         AI_Locomotion.enabled = false;    // the death config owns the transform now
 
         currentHealth = 0;
+        RunStats.ReportEnemyKilled();
         DeathSO.Die(this, root, deathParticle);
     }
 

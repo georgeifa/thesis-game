@@ -55,25 +55,24 @@ public class BreathTypeSkill : SkillsScriptableObject
     // old ones — the same leak as §10.2 in the completion plan.
     [System.NonSerialized] private ObjectPool windUpPool;
     [System.NonSerialized] private ObjectPool breathPool;
+
+    // A pool owns scene GameObjects, and this is a ScriptableObject — an ASSET.
+    // It outlives the scene, and its fields are not reset when "Reload Domain"
+    // is disabled in Enter Play Mode Options. So a cached pool can go stale at
+    // TWO different boundaries: a scene reload and a play-mode restart.
+    //
+    // ObjectPool.Session is bumped at both. The private counter this replaces
+    // tracked only play-mode starts — which is why Retry broke every pool in
+    // the game at once.
     [System.NonSerialized] private int poolSession = -1;
-
-    // A pool owns scene GameObjects, which are destroyed when play mode ends.
-    // ScriptableObject fields are NOT reset when "Reload Domain" is disabled in
-    // Enter Play Mode Options, so a cached pool can survive into the next play
-    // session pointing at destroyed objects. Bumping a session counter before
-    // each run makes the cache self-invalidating either way.
-    private static int session;
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void NewSession() => session++;
 
     private void EnsurePools()
     {
-        if (poolSession == session && windUpPool != null && breathPool != null) return;
+        if (poolSession == ObjectPool.Session && windUpPool != null && breathPool != null) return;
 
         windUpPool = windUpPrefab != null ? ObjectPool.CreateInstance(windUpPrefab, PoolSize) : null;
         breathPool = Prefab != null ? ObjectPool.CreateInstance(Prefab, PoolSize) : null;
-        poolSession = session;
+        poolSession = ObjectPool.Session;
     }
 
     #endregion

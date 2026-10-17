@@ -7,7 +7,7 @@ using UnityEngine;
 /// the run ends. Lives live here because they outlast any single soldier.
 ///
 /// ── WHY THE RUN ENDS IN TWO STEPS ───────────────────────────────────────
-/// `IsGameOver` is set the instant the last soldier falls — it is the GATE that
+/// `IsGameOver` is set the instant the run is decided — it is the GATE that
 /// stops anything else from reacting. `OnGameOver` fires a few seconds later —
 /// it is the PRESENTATION. Separating them means the death animation finishes
 /// before the results screen appears, without leaving a window in which a
@@ -15,6 +15,16 @@ using UnityEngine;
 ///
 /// Firing both at once cuts the fall off mid-animation and reads as a crash
 /// rather than a defeat.
+///
+/// `IsGameOver` is also what MissionManager polls to know it should stop
+/// ticking objectives, which is another reason it has to be set immediately
+/// rather than when the screen appears.
+///
+/// ── TWO WAYS TO LOSE, ONE WAY TO WIN ────────────────────────────────────
+/// The run can end because the soldiers ran out (here), because the mission
+/// clock expired, or because the player extracted (both from MissionManager).
+/// `EndRun` takes the headline so the results screen can say which — an
+/// unexplained "OUT OF TIME" ending reads as a bug.
 /// ────────────────────────────────────────────────────────────────────────
 /// </summary>
 public class GameManager : MonoBehaviour
@@ -37,7 +47,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float spentPodLifetime = 5f;
 
     [Header("Run end")]
-    [Tooltip("Seconds between the last soldier falling and the results screen " +
+    [Tooltip("Seconds between the run being decided and the results screen " +
              "appearing. Long enough for the death animation to finish.")]
     [SerializeField] private float gameOverDelay = 2.5f;
 
@@ -55,7 +65,14 @@ public class GameManager : MonoBehaviour
     public bool IsGameOver { get; private set; }
 
     public event Action<int> OnLivesChanged;
-    public event Action OnGameOver;
+
+    /// <summary>
+    /// Carries the headline — "ALL SOLDIERS LOST", "OUT OF TIME",
+    /// "EXTRACTION COMPLETE". The results screen displays it verbatim rather
+    /// than holding its own string, because only the caller knows which ending
+    /// this was.
+    /// </summary>
+    public event Action<string> OnGameOver;
 
     #endregion
 
@@ -121,7 +138,7 @@ public class GameManager : MonoBehaviour
         if (livesRemaining > 0)
             StartCoroutine(DeployAfterDelay());
         else
-            EndRun();
+            EndRun("ALL SOLDIERS LOST");
     }
 
     #endregion
@@ -159,8 +176,21 @@ public class GameManager : MonoBehaviour
 
     #region Run end
 
-    private void EndRun()
+    /// <summary>
+    /// Ends the run. Called from here when the soldiers run out, and from
+    /// MissionManager when the clock expires or the player extracts.
+    /// </summary>
+    /// <param name="headline">
+    /// What the results screen shows. The caller is the only thing that knows
+    /// which ending this was.
+    /// </param>
+    public void EndRun(string headline)
     {
+        // Now has more than one caller, so it needs the same re-entry guard
+        // HandleSoldierDied has. Dying on the same frame the clock expires is
+        // not a hypothetical.
+        if (IsGameOver) return;
+
         // Gate first, immediately — see the class summary.
         IsGameOver = true;
 
@@ -169,18 +199,18 @@ public class GameManager : MonoBehaviour
         // StopTimer is idempotent, so the screen's own call is a harmless no-op.
         RunStats.Instance?.StopTimer();
 
-        Debug.Log("GAME OVER — no soldiers remaining");
+        Debug.Log($"RUN OVER — {headline}");
 
-        StartCoroutine(ShowResultsAfterDelay());
+        StartCoroutine(ShowResultsAfterDelay(headline));
     }
 
-    private IEnumerator ShowResultsAfterDelay()
+    private IEnumerator ShowResultsAfterDelay(string headline)
     {
         // Scaled time is correct: timeScale is still 1 here. GameOverScreen.Show
         // is what zeroes it, and it does so last, after the panel is up.
         yield return new WaitForSeconds(gameOverDelay);
 
-        OnGameOver?.Invoke();
+        OnGameOver?.Invoke(headline);
     }
 
     #endregion

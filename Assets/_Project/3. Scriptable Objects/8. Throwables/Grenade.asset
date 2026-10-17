@@ -19,7 +19,7 @@ MonoBehaviour:
   Damage: 10
   StaggerForce: 35
   BlastRadius: 4
-  ExplodeAfter: 0.1
+  ExplodeAfter: 1
   TargetLayer:
     serializedVersion: 2
     m_Bits: 64

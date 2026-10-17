@@ -40,6 +40,8 @@ public class PlayerDeathHandler : MonoBehaviour
     private PlayerEquipmentManager equipment;
     private CharacterController controller;
     private PlayerAimController aim;
+    private PlayerInteractor interactor;
+
 
     private Animator animator;
 
@@ -59,6 +61,7 @@ public class PlayerDeathHandler : MonoBehaviour
         aim        = GetComponent<PlayerAimController>();
         controller = GetComponent<CharacterController>();
         animator   = GetComponent<Animator>();
+        interactor = GetComponent<PlayerInteractor>();
     }
 
     private void Start() => health.OnDeath += Die;
@@ -86,6 +89,9 @@ public class PlayerDeathHandler : MonoBehaviour
         combat.enabled     = false;
         movement.enabled   = false;
         controller.enabled = false;       // also what makes you undetectable
+        interactor.enabled = false;
+
+
 
         if (playerVisual != null)
             playerVisual.SetActive(false);
@@ -171,6 +177,8 @@ public class PlayerDeathHandler : MonoBehaviour
         input.enabled    = true;
         combat.enabled   = true;
         movement.enabled = true;
+        interactor.enabled = true;
+
     }
 
     #endregion

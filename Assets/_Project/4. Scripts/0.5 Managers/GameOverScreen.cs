@@ -29,11 +29,10 @@ public class GameOverScreen : MonoBehaviour
     [SerializeField] private GameObject panel;
 
     [Header("Headline")]
+    [Tooltip("Set from the headline GameManager sends — 'ALL SOLDIERS LOST', " +
+             "'OUT OF TIME', 'EXTRACTION COMPLETE'. Not authored here, because " +
+             "only the thing that ended the run knows which ending it was.")]
     [SerializeField] private TMP_Text titleText;
-    [Tooltip("Shown as the headline. 'MISSION FAILED' reads better than 'YOU " +
-             "DIED' when the run ends because reinforcements ran out rather " +
-             "than because one soldier fell.")]
-    [SerializeField] private string titleMessage = "MISSION FAILED";
 
     [Header("Stats")]
     [SerializeField] private TMP_Text killsText;
@@ -97,10 +96,12 @@ public class GameOverScreen : MonoBehaviour
 
     #region Show
 
-    private void Show()
+    private void Show(string headline)
     {
         RunStats stats = RunStats.Instance;
         if (stats != null) stats.StopTimer();
+
+        if (titleText != null) titleText.text = headline;
 
         Populate(stats);
 
@@ -115,8 +116,6 @@ public class GameOverScreen : MonoBehaviour
 
     private void Populate(RunStats stats)
     {
-        if (titleText != null) titleText.text = titleMessage;
-
         if (stats == null)
         {
             Debug.LogWarning($"{name}: no RunStats in the scene — stats will be blank.");

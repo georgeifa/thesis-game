@@ -12,6 +12,7 @@ public class MissionDebugOverlay : MonoBehaviour
 {
     [SerializeField] bool show = true;
     [SerializeField] PlayerInteractor interactor;
+    [SerializeField] ExtractionPad pad;
 
     GUIStyle style;
 
@@ -31,7 +32,7 @@ public class MissionDebugOverlay : MonoBehaviour
         if (style == null)
             style = new GUIStyle(GUI.skin.label) { fontSize = 13, richText = true };
 
-        int lines = 5 + m.ObjectivesTotal;
+        int lines = 6 + m.ObjectivesTotal;
         GUILayout.BeginArea(new Rect(10, 10, 520, 30 + lines * 18), GUI.skin.box);
 
         GUILayout.Label($"<b>MISSION</b>   {(m.IsRunning ? "running" : "ended")}" +
@@ -48,6 +49,12 @@ public class MissionDebugOverlay : MonoBehaviour
             GUILayout.Label(Describe(o), style);
         }
 
+        if (pad != null)
+        {
+            GUILayout.Space(4);
+            GUILayout.Label($"{"EXTRACTION PAD",-22} {pad.State,-12} t-{pad.Timer:0.0}", style);
+        }
+
         GUILayout.EndArea();
     }
 
@@ -61,6 +68,13 @@ public class MissionDebugOverlay : MonoBehaviour
         // Hold-specific extras, so the three phases of being away are visible.
         if (o is HoldZone h && o.State == ObjectiveState.Active)
             line += h.PlayerInside ? "   IN" : (h.Draining ? "   DRAINING" : "   grace");
+
+        // A raw percentage is useless for a count.
+        if (o is Eliminate e)
+            line += $"   {e.Killed}/{e.killsRequired}";
+
+        if (o is RestorePowerObjective p)
+            line += $"   {p.On}/{p.Total}";
 
         return line;
     }

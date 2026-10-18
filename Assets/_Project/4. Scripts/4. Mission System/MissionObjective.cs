@@ -135,6 +135,16 @@ public abstract class MissionObjective : MonoBehaviour, IInteractable
 
     protected virtual void OnResolved() { }
 
+    // Flat distance - height ignored. The player's pivot is at their feet, a
+    // prop's might be at its base or its middle, and on a slope they differ
+    // more. A spherical check quietly shrinks the usable radius.
+    protected bool IsInZone(Vector3 worldPos)
+    {
+        Vector3 d = worldPos - Centre;
+        d.y = 0f;
+        return d.sqrMagnitude <= radius * radius;
+    }
+
     public bool PlayerInRange()
     {
         if (player == null) return false;
@@ -145,9 +155,7 @@ public abstract class MissionObjective : MonoBehaviour, IInteractable
         // corpse as someone standing on it.
         if (playerHealth != null && playerHealth.IsDead) return false;
 
-        Vector3 d = player.position - Centre;
-        d.y = 0f;   // flat - the player and a prop's pivot sit at different heights
-        return d.sqrMagnitude <= radius * radius;
+        return IsInZone(player.position);
     }
 
     public virtual string Prompt =>
@@ -184,8 +192,9 @@ public abstract class MissionObjective : MonoBehaviour, IInteractable
 
     // Rolled by hand instead of Handles.DrawWireDisc, which needs a
     // UnityEditor using - and a stray one of those in a runtime script already
-    // cost us a broken build once.
-    static void DrawFlatCircle(Vector3 centre, float r)
+    // cost us a broken build once. Public because ExtractionPad draws the same
+    // shape and isn't an objective.
+    public static void DrawFlatCircle(Vector3 centre, float r)
     {
         const int steps = 40;
         Vector3 prev = centre + new Vector3(r, 0f, 0f);

@@ -563,6 +563,7 @@ public class Enemy : PoolableObject, IDamagable
 
         currentHealth = 0;
         RunStats.ReportEnemyKilled();
+        MissionManager.ReportEnemyKilled(transform.position);   
         DeathSO.Die(this, root, deathParticle);
     }
 

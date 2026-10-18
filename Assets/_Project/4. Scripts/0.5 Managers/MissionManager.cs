@@ -29,6 +29,9 @@ public class MissionManager : MonoBehaviour
     public float Elapsed => missionDuration - TimeLeft;
 
     public IReadOnlyList<MissionObjective> Objectives => objectives;
+
+    // The pad needs it too, and one wired reference is one fewer to forget.
+    public Transform Player => player;
     public int ObjectivesTotal => objectives.Count;
     public int ObjectivesCompleted { get; private set; }
 
@@ -140,6 +143,25 @@ public class MissionManager : MonoBehaviour
     {
         ExtractionOpen = true;
         Debug.Log($"[Mission] Extraction open ({why})");
+    }
+
+    // Called from Enemy.Die(). Static and null-safe for the same reason
+    // RunStats' reporters are: the call site is one line that can never throw
+    // and needs no reference.
+    //
+    // Deliberately NOT a static event on Enemy that Eliminate subscribes to.
+    // A static event is the shape that accumulated ten FieldOfView subscribers
+    // across respawns, and it would need unsubscribing on resolve, on destroy
+    // and on scene load. Pushing the kill in has no lifetime at all.
+    public static void ReportEnemyKilled(Vector3 position)
+    {
+        MissionManager m = Instance;
+        if (m == null || !m.IsRunning) return;
+
+        // Only one objective type cares about kills. When a second one does,
+        // that is when this earns a virtual on the base class.
+        foreach (MissionObjective o in m.objectives)
+            if (o is Eliminate e) e.RegisterKill(position);
     }
 
     // Called by the extraction pad when the teleport sequence finishes.

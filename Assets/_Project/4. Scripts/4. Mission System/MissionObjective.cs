@@ -187,7 +187,7 @@ public abstract class MissionObjective : MonoBehaviour, IInteractable
         // comparing, so the real check is an infinitely tall cylinder - a wire
         // sphere draws a shape the code doesn't actually use and makes you
         // think you're losing range at height.
-        DrawFlatCircle(Centre, radius);
+        GizmoDraw.FlatCircle(Centre, radius);
     }
 
     // Rolled by hand instead of Handles.DrawWireDisc, which needs a

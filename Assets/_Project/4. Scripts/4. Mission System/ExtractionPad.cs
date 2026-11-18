@@ -178,6 +178,6 @@ public class ExtractionPad : MonoBehaviour, IInteractable
             _                    => new Color(1f, 1f, 1f, 0.35f)
         };
 
-        MissionObjective.DrawFlatCircle(transform.position, radius);
+        GizmoDraw.FlatCircle(transform.position, radius);
     }
 }

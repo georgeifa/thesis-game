@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
 
 // Feeds enemies into an objective's zone while that objective is active.
 // Spawns a group up front, then tops up on a trickle as they die.
@@ -15,6 +14,7 @@ public class OutpostSpawner : MonoBehaviour
     [Tooltip("Spawns only while this is Active. Falls back to one on this object.")]
     [SerializeField] MissionObjective objective;
     [SerializeField] Transform player;
+    [SerializeField] EnemySpawnService spawner;
 
     [Header("What to spawn")]
     [SerializeField] List<EnemyScriptableObject> enemies = new List<EnemyScriptableObject>();
@@ -93,38 +93,12 @@ public class OutpostSpawner : MonoBehaviour
         if (enemies.Count == 0 || spawnPoints.Count == 0) return;
 
         EnemyScriptableObject config = enemies[Random.Range(0, enemies.Count)];
-
-        // Cheap now that CreateInstance is a dictionary lookup that validates
-        // and rebuilds a stale pool - no reason to cache the handle.
-        ObjectPool pool = ObjectPool.CreateInstance(config.Prefab, poolSize);
-        if (pool == null) return;
-
-        PoolableObject obj = pool.GetObject();
-        if (obj == null)
-        {
-            Debug.LogWarning($"{name}: pool exhausted for {config.name}.");
-            return;
-        }
-
-        Enemy enemy = obj.GetComponent<Enemy>();
         Transform point = spawnPoints[Random.Range(0, spawnPoints.Count)];
 
-        // Place first, configure second. ResetForSpawn skips every NavMesh call
-        // when the agent isn't on the mesh, and a pooled enemy sits wherever it
-        // sank until it's warped - so configuring first silently does nothing.
-        if (!NavMesh.SamplePosition(point.position, out NavMeshHit hit, 2f, NavMesh.AllAreas))
-        {
-            Debug.LogError($"{name}: spawn point '{point.name}' isn't near the NavMesh.");
-            obj.gameObject.SetActive(false);
-            return;
-        }
-
-        enemy.Agent.enabled = true;
-        enemy.Agent.Warp(hit.position);
-
-        config.SetupEnemy(enemy, player.gameObject);
-
-        spawned.Add(enemy);
+        // The service does the pool, the NavMesh placement and the setup -
+        // place-before-configure lives there now, not here.
+        Enemy enemy = spawner.SpawnAt(config, point.position, poolSize);
+        if (enemy != null) spawned.Add(enemy);
     }
 
     void OnDrawGizmosSelected()
